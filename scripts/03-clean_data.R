@@ -9,10 +9,28 @@
 
 #### Workspace setup ####
 library(tidyverse)
+library(arrow)
+
+#### Read Raw Data ####
+# Define the directory containing the Parquet files
+input_dir <- "data/01-raw_data"
+
+# Get the list of Parquet files in the directory
+parquet_files <- list.files(input_dir, pattern = "\\.parquet$", full.names = TRUE)
+
+# Read each Parquet file into the R environment as a data frame
+for (file in parquet_files) {
+  # Extract a clean name for the data frame based on the file name
+  data_name <- tools::file_path_sans_ext(basename(file))
+  
+  # Read the Parquet file and assign it to the environment
+  assign(data_name, read_parquet(file), envir = .GlobalEnv)
+  
+  message(paste("Loaded Parquet file:", file, "as", data_name))
+}
+
 
 #### Clean data ####
-raw_data <- read_csv("inputs/data/plane_data.csv")
-
 cleaned_data <-
   raw_data |>
   janitor::clean_names() |>
