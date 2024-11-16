@@ -12,18 +12,23 @@ library(tidyverse)
 library(arrow)
 
 #### Read Raw Data ####
-# Define the directory containing the Parquet files
-input_dir <- "data/01-raw_data"
+# Define the main output directory and metadata subdirectory
+output_dir <- "data/01-raw_data"
+metadata_dir <- file.path(output_dir, "metadata")
 
-# Get the list of Parquet files in the directory
-parquet_files <- list.files(input_dir, pattern = "\\.parquet$", full.names = TRUE)
+# Get a list of all Parquet files in the output directory and metadata subdirectory
+main_files <- list.files(output_dir, pattern = "\\.parquet$", full.names = TRUE)
+metadata_files <- list.files(metadata_dir, pattern = "\\.parquet$", full.names = TRUE)
 
-# Read each Parquet file into the R environment as a data frame
-for (file in parquet_files) {
-  # Extract a clean name for the data frame based on the file name
+# Combine file lists
+all_files <- c(main_files, metadata_files)
+
+# Read each Parquet file and assign it to the environment with a clean name
+for (file in all_files) {
+  # Create a clean name for the data frame (remove directory and extension)
   data_name <- tools::file_path_sans_ext(basename(file))
   
-  # Read the Parquet file and assign it to the environment
+  # Read the Parquet file and assign it to the global environment
   assign(data_name, read_parquet(file), envir = .GlobalEnv)
   
   message(paste("Loaded Parquet file:", file, "as", data_name))
@@ -31,6 +36,9 @@ for (file in parquet_files) {
 
 
 #### Clean data ####
+# Remember to remove datasheet without any observations!
+
+
 cleaned_data <-
   raw_data |>
   janitor::clean_names() |>
