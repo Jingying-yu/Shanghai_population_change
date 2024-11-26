@@ -3,7 +3,7 @@ title: "My title"
 subtitle: "Impact Analysis of Japanese Occupation on Population Shifts Across Shanghai’s Districts During WWII"
 author: 
   - Sandy Yu
-thanks: "Code and data are available at: https://github.com/Jingying-yu/Shanghai_population_change/tree/main"
+thanks: "Code and data are available at: https://github.com/Jingying-yu/Shanghai_population_change"
 date: today
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
@@ -45,36 +45,40 @@ Telegraphing paragraph: The remainder of this paper is structured as follows. @s
 
 We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
 
-Overview text
+## Data Sources
+- talk about where the data in my primary reference book is gathered
+- mentions the credibility of source and unstability of recording instrument & methodology
 
 ## Historical Background
-- breifly introduces the necessary historical background for this analysis
+Place: Shanghai, China
+When: 1936-1942
+Who: Chinese population in Shanghai
 
+Define:
+1. give 1-2 sentence broad overview of China's state of unrest
+2.THREE districts in Shanghai: Chinese District, International Settlement, French Concession
+- who controlled each district and the level of governance each authority have in comparison to Chinese government
+3.Outline area (%) of each district (do not get into specifics, put that in Results section)
+
+Important Event Timeline
+1. 1937-08-13: Japanese armed forces entered Shanghai
+2. 1937-11-12: Japanese armed forces claims occupation of Shanghai --> ends Chinese district 
+3. 1942-01: Japanese armed forces claims authority over International Settlement (which was mainly under the governance of U.K and U.S prior to this date)
+4. 1945-08-15: Japan surrendered in WWII
+5. 1945-10: most Japanese armed forces withdrawed from Shanghai
 
 ## Measurement
 	
 - how population is recorded (not accurate count but by householad then estimates by average)
 - why use population density instead of pure population #
+- how year variables correspond to the timeline (ex. if an event occured in Nov of 1937, would I take valeus of 1937 as a variable for prior to event occurance or after?)
 
 ## Outcome variables
+- outcome variable is "population change in International Settlement during 1937-1942" measured in population density
+
 
 Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
-
-
-
 Some of our data is of penguins (@fig-bills), from @palmerpenguins.
-
-```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
-#| echo: false
-
-
-```
-
-Talk more about it.
-
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
 
 ```{r}
 #| label: fig-planes
@@ -86,17 +90,17 @@ And also planes (@fig-planes). (You can change the height and width, but don't w
 
 ```
 
-Talk way more about it. 
+
 
 ## Predictor variables
 
-Add graphs, tables and text.
+- most important predictors include time sensitive indicators: Event1 & Event2
 
-Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
+Event1: indicator variable for 1937 (1 if year >= 1937 & <= 1941, 0 otherwise)
+- mention a bit about the measurement
 
-
-
-
+Event2: indicator variable for 1937 (1 if year >= 1941, 0 otherwise)
+- mention a bit about the measurement
 
 
 
@@ -177,16 +181,20 @@ modelsummary::modelsummary(
 - industrialization was not so popular back in the 1930s, many provinces are still mostly rural. But warfare messed with the land and the yields, causing many farmers to starve and ultimately have to seek refugee (find job) in industrialized city (where income is not dependent on land yield)
 - many people flooded to Shanghai for this reason (can insert calculation in data table 20 from reference book here)
 
-## Job Oppurtunities
+### Job Oppurtunities in Shanghai
 Aside from the instability caused by the Japanese armed forces, there are a few other reasons for Chinese population to move into the international settlement & French Concession.
 1. Job opportunities
 - Heart of Shanghai city in the 1930-1940s, high pop density lead to boom of economy = more job opportunities
 - many factories are located with the settlements (less so in concession)
 
-## Barrier to Entry in Job Market
+### Barrier to Entry in Job Market
 2. Barrier to Entry for certain job types
 - 旧时候 -- 通讯还没有那么发达的时候，人们都很团结。那个时候同乡会的力量很强大。在外省，从同一个省来的漂泊者会互相帮扶着垄断一个城市的某种行业。例如，在旧上海，要做酒店生意的话你就必须是湖南人，给人做洗脚生意的肯定是苏北人。。。
 
+## Instability after Japanese Occupation ends in WWII: Chinese Civil War
+- after the Japanese armed forces withdrawed from Shanghai, what follows is not recovery and rest for the local population
+- Competition for power within China's 2 political parties caused full-scale political warfare, now known as the *Chinese Civil War*
+- unlike Western political parties, Chinese political parties in the 1900s are more like parties of a throne. They each have their own ideology and an armed forces that follow. Most of all of the provinces are effected by this internal warfare, which ended in 1949 as 国民党 lost and withdrawed to Taiwan.
 
 ## Weaknesses and next steps
 

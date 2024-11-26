@@ -45,7 +45,11 @@ cleaned_refugees_data <- refugees_data |>
 #  ) |>
 #  ungroup()
 
+#### Clean the Population 1852-1950 Data ####
+
+
+
 
 
 #### Save data ####
-write_csv(cleaned_data, "outputs/data/analysis_data.csv")
+write_parquet(cleaned_pop_1852_1950, "data/02-analysis_data/pop_analysis_data.parquet")
