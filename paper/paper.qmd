@@ -1,10 +1,9 @@
 ---
 title: "My title"
-subtitle: "My subtitle if needed"
+subtitle: "Impact Analysis of Japanese Occupation on Population Shifts Across Shanghai’s Districts During WWII"
 author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: [https://github.com/RohanAlexander/starter_folder](https://github.com/RohanAlexander/starter_folder)."
+  - Sandy Yu
+thanks: "Code and data are available at: https://github.com/Jingying-yu/Shanghai_population_change/tree/main"
 date: today
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
@@ -48,9 +47,14 @@ We use the statistical programming language R [@citeR].... Our data [@shelter]..
 
 Overview text
 
+## Historical Background
+- breifly introduces the necessary historical background for this analysis
+
+
 ## Measurement
 	
-Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
+- how population is recorded (not accurate count but by householad then estimates by average)
+- why use population density instead of pure population #
 
 ## Outcome variables
 
@@ -65,13 +69,7 @@ Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 #| fig-cap: Bills of penguins
 #| echo: false
 
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
+
 ```
 
 Talk more about it.
@@ -85,14 +83,7 @@ And also planes (@fig-planes). (You can change the height and width, but don't w
 #| warning: false
 #| message: false
 
-analysis_data <- read_csv(here::here("data/02-analysis_data/analysis_data.csv"))
 
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
 ```
 
 Talk way more about it. 
@@ -112,9 +103,11 @@ Use sub-sub-headings for each outcome variable and feel free to combine a few in
 
 # Model
 
-The goal of our modelling strategy is twofold. Firstly,...
+The goal of our modelling strategy is to evaluate the impact of 2 historical events in Shanghai during WWII.
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
+Here we briefly describe the Difference-in-Difference analysis model used to investigate the impact of the Japanese forces taking over the Chinese district and International Settlement in November 1937 and December 1941 on population shift between different Districts in Shanghai.
+
+Background details and diagnostics are included in [Appendix -@sec-model-details].
 
 ## Model set-up
 
@@ -176,19 +169,35 @@ modelsummary::modelsummary(
 
 # Discussion
 
-## First discussion point {#sec-first-point}
+## Reason why the French Concession was Exempted from Japanese Occupation
+- During WWII, on the European battlefield, France surrendered to Germany on June 22nd of 1940 (Check this & reference with a credible source). Since Japan was on the same side as Germany during that time, Japanese armed forces decided allow the French Concession to retain its own governance.
+- However, the French Concession is still constantly under the watch of the Japanese forces that has occupied the rest of Shanghai since 1942. 街上不得有侮辱日本的旗帜或者宣言，官方必须积极配合日本统治者进行有利于日本统治的宣传,etc.(can reference to video summary here)
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+## Refugees from outside of Shanghai Province
+- industrialization was not so popular back in the 1930s, many provinces are still mostly rural. But warfare messed with the land and the yields, causing many farmers to starve and ultimately have to seek refugee (find job) in industrialized city (where income is not dependent on land yield)
+- many people flooded to Shanghai for this reason (can insert calculation in data table 20 from reference book here)
 
-## Second discussion point
+## Job Oppurtunities
+Aside from the instability caused by the Japanese armed forces, there are a few other reasons for Chinese population to move into the international settlement & French Concession.
+1. Job opportunities
+- Heart of Shanghai city in the 1930-1940s, high pop density lead to boom of economy = more job opportunities
+- many factories are located with the settlements (less so in concession)
 
-Please don't use these as sub-heading labels - change them to be what your point actually is.
+## Barrier to Entry in Job Market
+2. Barrier to Entry for certain job types
+- 旧时候 -- 通讯还没有那么发达的时候，人们都很团结。那个时候同乡会的力量很强大。在外省，从同一个省来的漂泊者会互相帮扶着垄断一个城市的某种行业。例如，在旧上海，要做酒店生意的话你就必须是湖南人，给人做洗脚生意的肯定是苏北人。。。
 
-## Third discussion point
 
 ## Weaknesses and next steps
 
-Weaknesses and next steps should also be included.
+### Data Measurement Weaknesses
+- data was recorded during wartime, many numbers were missing
+- base unit for population records is not ppl, it is instead "household". # of ppl in a household is estimated based on historical data
+- many people chose to not report or partially report numbers due to convience or economic reasons, data may not be accurate
+
+### Next Steps
+
+
 
 \newpage
 

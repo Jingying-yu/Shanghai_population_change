@@ -10,61 +10,42 @@
 #### Workspace setup ####
 library(tidyverse)
 library(arrow)
+library(dplyr)
 
 #### Read Raw Data ####
-# Define the main output directory and metadata subdirectory
-output_dir <- "data/01-raw_data"
-metadata_dir <- file.path(output_dir, "metadata")
-
-# Get a list of all Parquet files in the output directory and metadata subdirectory
-main_files <- list.files(output_dir, pattern = "\\.parquet$", full.names = TRUE)
-metadata_files <- list.files(metadata_dir, pattern = "\\.parquet$", full.names = TRUE)
-
-# Combine file lists
-all_files <- c(main_files, metadata_files)
-
-# Read each Parquet file and assign it to the environment with a clean name
-for (file in all_files) {
-  # Create a clean name for the data frame (remove directory and extension)
-  data_name <- tools::file_path_sans_ext(basename(file))
-  
-  # Read the Parquet file and assign it to the global environment
-  assign(data_name, read_parquet(file), envir = .GlobalEnv)
-  
-  message(paste("Loaded Parquet file:", file, "as", data_name))
-}
+pop_1852_1950 <- read_parquet(file.path("data/01-raw_data", "shanghai_population_1852_1950.parquet"))
+refugees_data <- read_parquet(file.path("data/01-raw_data", "refugees_data.parquet"))
 
 
 #### Clean data ####
-# Remember to remove datasheet without any observations!
+
+#### Clean the Refugees Data ####
+cleaned_refugees_data <- refugees_data |>
+  as.data.frame() |>
+  (\(df) df[, 1:6])() |>  # Keep only the first 6 columns
+  (\(df) df[, -c(2, 4)])() |>  # Remove columns 2 and 4
+  slice(-c(1:3)) |>  # Remove rows 1 to 3
+  setNames(c("date", "is_refugees", "fc_refugees", "total")) |>  # Rename columns
+  mutate(
+    date = as.Date(as.numeric(date), origin = "1899-12-30"),  # Convert Excel serial numbers
+  is_refugees = as.numeric(is_refugees), fc_refugees = as.numeric(fc_refugees)) |>
+  mutate(
+    across(c(is_refugees, fc_refugees, total), ~ replace_na(as.numeric(.), 0)) # treat NAs as 0
+  )
 
 
-cleaned_data <-
-  raw_data |>
-  janitor::clean_names() |>
-  select(wing_width_mm, wing_length_mm, flying_time_sec_first_timer) |>
-  filter(wing_width_mm != "caw") |>
-  mutate(
-    flying_time_sec_first_timer = if_else(flying_time_sec_first_timer == "1,35",
-                                   "1.35",
-                                   flying_time_sec_first_timer)
-  ) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "490",
-                                 "49",
-                                 wing_width_mm)) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "6",
-                                 "60",
-                                 wing_width_mm)) |>
-  mutate(
-    wing_width_mm = as.numeric(wing_width_mm),
-    wing_length_mm = as.numeric(wing_length_mm),
-    flying_time_sec_first_timer = as.numeric(flying_time_sec_first_timer)
-  ) |>
-  rename(flying_time = flying_time_sec_first_timer,
-         width = wing_width_mm,
-         length = wing_length_mm
-         ) |> 
-  tidyr::drop_na()
+#year_refugee_summary <- cleaned_refugees_data |>
+#  group_by(date = as.numeric(format(date, "%Y"))) |>  # Group by year extracted from the `date` column
+#  summarize(
+#    total_is_refugees = sum(is_refugees, na.rm = TRUE),   # Summing `is_refugees`
+#    total_fc_refugees = sum(fc_refugees, na.rm = TRUE)    # Summing `fc_refugees`
+#  ) |>
+#  mutate(
+#    total_sum = total_is_refugees + total_fc_refugees     # Calculate the total column
+#  ) |>
+#  ungroup()
+
+
 
 #### Save data ####
 write_csv(cleaned_data, "outputs/data/analysis_data.csv")
