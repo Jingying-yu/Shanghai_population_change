@@ -52,4 +52,4 @@ cleaned_refugees_data <- refugees_data |>
 
 
 #### Save data ####
-write_parquet(cleaned_pop_1852_1950, "data/02-analysis_data/pop_analysis_data.parquet")
+write_parquet(pop_1852_1950, "data/02-analysis_data/pop_analysis_data.parquet")

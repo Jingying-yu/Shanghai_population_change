@@ -1,89 +1,108 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the simulated Australian 
-  #electoral divisions dataset.
-# Author: Rohan Alexander
-# Date: 26 September 2024
-# Contact: rohan.alexander@utoronto.ca
+# Purpose: Tests the structure and validity of the simulated simulated_data
+# Author: Sandy Yu
+# Date: 16 November 2024
+# Contact: jingying.yu@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
   # - The `tidyverse` package must be installed and loaded
   # - 00-simulate_data.R must have been run
-# Any other information needed? Make sure you are in the `starter_folder` rproj
 
 
 #### Workspace setup ####
 library(tidyverse)
+library(arrow)
 
-analysis_data <- read_csv("data/00-simulated_data/simulated_data.csv")
+simulated_data <- read_parquet("data/00-simulated_data/simulated_data.parquet")
 
 # Test if the data was successfully loaded
-if (exists("analysis_data")) {
-  message("Test Passed: The dataset was successfully loaded.")
+if (exists("simulated_data")) {
+  message("Test Passed: The simulated_data was successfully loaded.")
 } else {
-  stop("Test Failed: The dataset could not be loaded.")
+  stop("Test Failed: The simulated_data could not be loaded.")
 }
 
 
 #### Test data ####
-
-# Check if the dataset has 151 rows
-if (nrow(analysis_data) == 151) {
-  message("Test Passed: The dataset has 151 rows.")
+# Test 1: Check if the simulated_data has the correct number of rows
+expected_rows <- length(years) * length(districts)
+if (nrow(simulated_data) == expected_rows) {
+  message("Test Passed: The simulated_data has the correct number of rows.")
 } else {
-  stop("Test Failed: The dataset does not have 151 rows.")
+  stop("Test Failed: The simulated_data does not have the correct number of rows.")
 }
 
-# Check if the dataset has 3 columns
-if (ncol(analysis_data) == 3) {
-  message("Test Passed: The dataset has 3 columns.")
+# Test 2: Check if the simulated_data has the correct number of columns
+expected_columns <- 10  # Adjust based on the simulated_data structure
+if (ncol(simulated_data) == expected_columns) {
+  message("Test Passed: The simulated_data has the correct number of columns.")
 } else {
-  stop("Test Failed: The dataset does not have 3 columns.")
+  stop("Test Failed: The simulated_data does not have the correct number of columns.")
 }
 
-# Check if all values in the 'division' column are unique
-if (n_distinct(analysis_data$division) == nrow(analysis_data)) {
-  message("Test Passed: All values in 'division' are unique.")
+# Test 3: Check for missing values in any column
+if (all(complete.cases(simulated_data))) {
+  message("Test Passed: There are no missing values in the simulated_data.")
 } else {
-  stop("Test Failed: The 'division' column contains duplicate values.")
+  stop("Test Failed: There are missing values in the simulated_data.")
 }
 
-# Check if the 'state' column contains only valid Australian state names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", 
-                  "Western Australia", "Tasmania", "Northern Territory", 
-                  "Australian Capital Territory")
-
-if (all(analysis_data$state %in% valid_states)) {
-  message("Test Passed: The 'state' column contains only valid Australian state names.")
+# Test 4: Verify the year range
+expected_years <- 1936:1942
+if (all(simulated_data$Year %in% expected_years)) {
+  message("Test Passed: The year range is correct.")
 } else {
-  stop("Test Failed: The 'state' column contains invalid state names.")
+  stop("Test Failed: The year range is not correct.")
 }
 
-# Check if the 'party' column contains only valid party names
-valid_parties <- c("Labor", "Liberal", "Greens", "National", "Other")
-
-if (all(analysis_data$party %in% valid_parties)) {
-  message("Test Passed: The 'party' column contains only valid party names.")
+# Test 5: Check the data types of specific columns
+if (is.numeric(simulated_data$Year)) {
+  message("Test Passed: 'Year' is numeric.")
 } else {
-  stop("Test Failed: The 'party' column contains invalid party names.")
+  stop("Test Failed: 'Year' is not numeric.")
 }
 
-# Check if there are any missing values in the dataset
-if (all(!is.na(analysis_data))) {
-  message("Test Passed: The dataset contains no missing values.")
+if (is.character(simulated_data$District)) {
+  message("Test Passed: 'District' is character.")
 } else {
-  stop("Test Failed: The dataset contains missing values.")
+  stop("Test Failed: 'District' is not character.")
 }
 
-# Check if there are no empty strings in 'division', 'state', and 'party' columns
-if (all(analysis_data$division != "" & analysis_data$state != "" & analysis_data$party != "")) {
-  message("Test Passed: There are no empty strings in 'division', 'state', or 'party'.")
+if (is.numeric(simulated_data$Population)) {
+  message("Test Passed: 'Population' is numeric.")
 } else {
-  stop("Test Failed: There are empty strings in one or more columns.")
+  stop("Test Failed: 'Population' is not numeric.")
 }
 
-# Check if the 'party' column has at least two unique values
-if (n_distinct(analysis_data$party) >= 2) {
-  message("Test Passed: The 'party' column contains at least two unique values.")
+# Test 6: Verify the values in the 'District' column
+expected_districts <- c("Chinese District", "International Settlement", "French Concession")
+if (all(simulated_data$District %in% expected_districts)) {
+  message("Test Passed: The 'District' column has valid values.")
 } else {
-  stop("Test Failed: The 'party' column contains less than two unique values.")
+  stop("Test Failed: The 'District' column has invalid values.")
+}
+
+# Test 7: Check if 'cd_occupied', 'french_surrender', and 'is_occupied' are binary
+binary_columns <- c("cd_occupied", "french_surrender", "is_occupied")
+for (col in binary_columns) {
+  if (all(simulated_data[[col]] %in% c(0, 1))) {
+    message(paste("Test Passed:", col, "is binary."))
+  } else {
+    stop(paste("Test Failed:", col, "is not binary."))
+  }
+}
+
+# Test 8: Verify no negative values in 'Population'
+if (all(simulated_data$Population >= 0)) {
+  message("Test Passed: 'Population' has no negative values.")
+} else {
+  stop("Test Failed: 'Population' contains negative values.")
+}
+
+
+# Test 9: Verify that population change is zero for 1936
+if (all(simulated_data$Population_Change[simulated_data$Year == 1936] == 0)) {
+  message("Test Passed: 'Population_Change' is zero for 1936.")
+} else {
+  stop("Test Failed: 'Population_Change' is not zero for 1936.")
 }
