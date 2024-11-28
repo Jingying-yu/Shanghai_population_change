@@ -198,5 +198,6 @@ combined_data <- rbind(
 #### Save data ####
 write_parquet(pop_1852_1950, "data/02-analysis_data/pop_analysis_data.parquet")
 write_parquet(cleaned_refugees_data, "data/02-analysis_data/cleaned_refugees_data.parquet")
+write_parquet(calibration_percent, "data/02-analysis_data/calibration_percent.parquet")
 write_parquet(combined_data, "data/02-analysis_data/combined_data.parquet")
 
