@@ -128,7 +128,9 @@ y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
 
 We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
 
-
+\[
+Population_{it} = \beta_0 + \beta_1 \cdot cd\_occupied_t + \beta_2 \cdot french\_surrender_t + \beta_3 \cdot is\_occupied_t + \beta_4 \cdot DistrictType_i + \beta_5 \cdot (cd\_occupied_t \times DistrictType_i) + \beta_6 \cdot (french\_surrender_t \times DistrictType_i) + \beta_7\cdot (is\_occupied_t \times DistrictType_i) + \epsilon{it}
+\]
 ### Model justification
 
 We expect a positive relationship between the size of the wings and time spent aloft. In particular...
@@ -148,8 +150,8 @@ Our results are summarized in @tbl-modelresults.
 
 library(rstanarm)
 
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
+did_model <-
+  readRDS(file = here::here("models/did_model.rds"))
 ```
 
 ```{r}
@@ -161,7 +163,7 @@ first_model <-
 
 modelsummary::modelsummary(
   list(
-    "First model" = first_model
+    "Population model" = did_model
   ),
   statistic = "mad",
   fmt = 2

@@ -195,9 +195,32 @@ combined_data <- rbind(
   combined_data[6, ]  # Keep rows after 1939
 )
 
+
+# Reshape the final combined_data into model-friendly format
+model_format <- combined_data |>
+  pivot_longer(
+    cols = c(chn_admin_pop, is_pop, fc_pop),
+    names_to = "district_type",
+    values_to = "population"
+  ) |>
+  mutate(
+    # Create a categorical variable for district type
+    district_type = case_when(
+      district_type == "chn_admin_pop" ~ "Chinese-administered area",
+      district_type == "is_pop" ~ "International Settlement",
+      district_type == "fc_pop" ~ "French Concession")) |> 
+  mutate(cd_occupied = ifelse(year >= 1937, 1, 0),  # Event 1: Japanese occupation of CD
+         french_surrender = ifelse(year >= 1940, 1, 0),  # Event 2: Rejection of refugees in FC
+         is_occupied = ifelse(year >= 1942, 1, 0)) |> # Event 3: Japanese occupation of IS
+  mutate(district_is = ifelse(district_type == "International Settlement", 1, 0),  # Dummy for IS
+         district_fc = ifelse(district_type == "French Concession", 1, 0)) |>         # Dummy for FC
+  mutate(district_type = as.factor(district_type))  # Ensure District is a factor
+
+
 #### Save data ####
 write_parquet(pop_1852_1950, "data/02-analysis_data/pop_analysis_data.parquet")
 write_parquet(cleaned_refugees_data, "data/02-analysis_data/cleaned_refugees_data.parquet")
 write_parquet(calibration_percent, "data/02-analysis_data/calibration_percent.parquet")
 write_parquet(combined_data, "data/02-analysis_data/combined_data.parquet")
-
+write_parquet(model_format, "data/02-analysis_data/model_format.parquet")
+write_csv(model_format, "data/02-analysis_data/model_format.csv")
