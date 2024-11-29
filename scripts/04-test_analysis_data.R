@@ -9,61 +9,181 @@
 
 
 #### Workspace setup ####
+model_format <- read_parquet("data/02-analysis_data/model_format.parquet")
+year_refugee_summary <- read_parquet("data/02-analysis_data/year_refugee_summary.parquet")
+calibration_percent <- read_parquet("data/02-analysis_data/calibration_percent.parquet")
+
 library(tidyverse)
 library(testthat)
-
-data <- read_csv("data/02-analysis_data/analysis_data.csv")
-
+library(arrow)
 
 #### Test data ####
-# Test that the dataset has 151 rows - there are 151 divisions in Australia
-test_that("dataset has 151 rows", {
-  expect_equal(nrow(analysis_data), 151)
+
+## Basic Tests
+test_that("year column contains only values from 1936 to 1942", {
+  expect_true(all(model_format$year >= 1936 & model_format$year <= 1942))
 })
 
-# Test that the dataset has 3 columns
-test_that("dataset has 3 columns", {
-  expect_equal(ncol(analysis_data), 3)
+test_that("there are no missing values in the dataset", {
+  expect_true(all(complete.cases(model_format)))
 })
 
-# Test that the 'division' column is character type
-test_that("'division' is character", {
-  expect_type(analysis_data$division, "character")
+test_that("district_type has only three unique values and each appears the same amount of times", {
+  unique_districts <- unique(model_format$district_type)
+  expect_length(unique_districts, 3)
+  
+  # Check that each district appears the same number of times
+  district_counts <- table(model_format$district_type)
+  expect_true(all(district_counts == district_counts[1]))
 })
 
-# Test that the 'party' column is character type
-test_that("'party' is character", {
-  expect_type(analysis_data$party, "character")
+
+test_that("class type for each column is appropriate", {
+  expect_type(model_format$year, "double")
+  expect_type(model_format$district_type, "character")
+  expect_type(model_format$population, "double")
+  expect_type(model_format$cd_occupied, "double")
+  expect_type(model_format$french_surrender, "double")
+  expect_type(model_format$is_occupied, "double")
 })
 
-# Test that the 'state' column is character type
-test_that("'state' is character", {
-  expect_type(analysis_data$state, "character")
+
+
+## Test that missing value in initial model_format dataset has been calibrated correctly with the help of other datasets
+# Test for 1938: Chinese-administered area
+test_that("1938 population for Chinese-administered area is correct", {
+  base_pop <- model_format |>
+    filter(year == 1937, district_type == "Chinese-administered area") |>
+    pull(population)
+  
+  is_refugees <- year_refugee_summary |>
+    filter(year == 1938) |>
+    pull(is_refugees)
+  
+  fc_refugees <- year_refugee_summary |>
+    filter(year == 1938) |>
+    pull(fc_refugees)
+  
+  expected_pop <- base_pop - (is_refugees + fc_refugees)
+  actual_pop <- model_format |>
+    filter(year == 1938, district_type == "Chinese-administered area") |>
+    pull(population)
+  
+  expect_equal(actual_pop, expected_pop)
 })
 
-# Test that there are no missing values in the dataset
-test_that("no missing values in dataset", {
-  expect_true(all(!is.na(analysis_data)))
+
+# Test for 1938: International Settlement
+test_that("1938 population for International Settlement is correct", {
+  base_pop <- model_format |>
+    filter(year == 1937, district_type == "International Settlement") |>
+    pull(population)
+  
+  is_refugees <- year_refugee_summary |>
+    filter(year == 1938) |>
+    pull(is_refugees)
+  
+  expected_pop <- base_pop + is_refugees
+  actual_pop <- model_format |>
+    filter(year == 1938, district_type == "International Settlement") |>
+    pull(population)
+  
+  expect_equal(actual_pop, expected_pop)
 })
 
-# Test that 'division' contains unique values (no duplicates)
-test_that("'division' column contains unique values", {
-  expect_equal(length(unique(analysis_data$division)), 151)
+# Test for 1938: French Concession
+test_that("1938 population for French Concession is correct", {
+  base_pop <- model_format |>
+    filter(year == 1937, district_type == "French Concession") |>
+    pull(population)
+  
+  fc_refugees <- year_refugee_summary |>
+    filter(year == 1938) |>
+    pull(fc_refugees)
+  
+  expected_pop <- base_pop + fc_refugees
+  actual_pop <- model_format |>
+    filter(year == 1938, district_type == "French Concession") |>
+    pull(population)
+  
+  expect_equal(actual_pop, expected_pop)
 })
 
-# Test that 'state' contains only valid Australian state or territory names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", "Western Australia", 
-                  "Tasmania", "Northern Territory", "Australian Capital Territory")
-test_that("'state' contains valid Australian state names", {
-  expect_true(all(analysis_data$state %in% valid_states))
+# Test for 1939: Chinese-administered area
+test_that("1939 population for Chinese-administered area is correct", {
+  base_pop <- model_format |>
+    filter(year == 1937, district_type == "Chinese-administered area") |>
+    pull(population)
+  
+  is_refugees <- year_refugee_summary |>
+    filter(year == 1939) |>
+    pull(is_refugees)
+  
+  fc_refugees <- year_refugee_summary |>
+    filter(year == 1939) |>
+    pull(fc_refugees)
+  
+  expected_pop <- base_pop - (is_refugees + fc_refugees)
+  actual_pop <- model_format |>
+    filter(year == 1939, district_type == "Chinese-administered area") |>
+    pull(population)
+  
+  expect_equal(actual_pop, expected_pop)
 })
 
-# Test that there are no empty strings in 'division', 'party', or 'state' columns
-test_that("no empty strings in 'division', 'party', or 'state' columns", {
-  expect_false(any(analysis_data$division == "" | analysis_data$party == "" | analysis_data$state == ""))
+# Test for 1939: International Settlement
+test_that("1939 population for International Settlement is correct", {
+  base_pop <- model_format |>
+    filter(year == 1937, district_type == "International Settlement") |>
+    pull(population)
+  
+  is_refugees <- year_refugee_summary |>
+    filter(year == 1939) |>
+    pull(is_refugees)
+  
+  expected_pop <- base_pop + is_refugees
+  actual_pop <- model_format |>
+    filter(year == 1939, district_type == "International Settlement") |>
+    pull(population)
+  
+  expect_equal(actual_pop, expected_pop)
 })
 
-# Test that the 'party' column contains at least 2 unique values
-test_that("'party' column contains at least 2 unique values", {
-  expect_true(length(unique(analysis_data$party)) >= 2)
+# Test for 1939: French Concession
+test_that("1939 population for French Concession is correct", {
+  base_pop <- model_format |>
+    filter(year == 1937, district_type == "French Concession") |>
+    pull(population)
+  
+  fc_refugees <- year_refugee_summary |>
+    filter(year == 1939) |>
+    pull(fc_refugees)
+  
+  expected_pop <- base_pop + fc_refugees
+  actual_pop <- model_format |>
+    filter(year == 1939, district_type == "French Concession") |>
+    pull(population)
+  
+  expect_equal(actual_pop, expected_pop)
 })
+
+# Test for 1941 value
+test_that("value in 1941 matches pop_1941 * percentage_adjusted from calibration_percent", {
+  for (district in unique(model_format$district_type)) {
+    pop_1941 <- calibration_percent |>
+      filter(category == district) |>
+      pull(pop_1941)
+    
+    percentage_adjusted <- calibration_percent |>
+      filter(category == district) |>
+      pull(percentage_adjusted)
+    
+    expected_value <- pop_1941 * percentage_adjusted
+    actual_value <- model_format |>
+      filter(year == 1941, district_type == district) |>
+      pull(population)
+    
+    expect_true(abs(actual_value - expected_value) < 1) #allow for some rounding difference
+  }
+})
+
