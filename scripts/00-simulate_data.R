@@ -61,3 +61,4 @@ simulated_data <- simulated_data |>
 
 #### Save data ####
 write_parquet(simulated_data, "data/00-simulated_data/simulated_data.parquet")
+write_csv(simulated_data, "data/00-simulated_data/simulated_data.csv")
