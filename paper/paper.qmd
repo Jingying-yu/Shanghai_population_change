@@ -18,9 +18,11 @@ bibliography: references.bib
 #| message: false
 
 library(tidyverse)
-library(palmerpenguins)
+library(arrow)
+library(knitr)
+library(modelsummary)
+library(rstanarm)
 ```
-
 
 # Introduction
 
@@ -34,11 +36,6 @@ Why it matters paragraph
 
 Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
 
-
-
-
-
-
 # Data {#sec-data}
 
 ## Overview
@@ -46,41 +43,29 @@ Telegraphing paragraph: The remainder of this paper is structured as follows. @s
 We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
 
 ## Data Sources
-- talk about where the data in my primary reference book is gathered
-- mentions the credibility of source and unstability of recording instrument & methodology
+
+-   talk about where the data in my primary reference book is gathered
+-   mentions the credibility of source and unstability of recording instrument & methodology
 
 ## Historical Background
-Place: Shanghai, China
-When: 1936-1942
-Who: Chinese population in Shanghai
 
-Define:
-1. give 1-2 sentence broad overview of China's state of unrest
-2.THREE districts in Shanghai: Chinese District, International Settlement, French Concession
-- who controlled each district and the level of governance each authority have in comparison to Chinese government
-3.Outline area (%) of each district (do not get into specifics, put that in Results section)
+Place: Shanghai, China When: 1936-1942 Who: Chinese population in Shanghai
 
-Important Event Timeline
-1. 1937-08-13: Japanese armed forces entered Shanghai
-2. 1937-11-12: Japanese armed forces claims occupation of Shanghai --> ends Chinese district 
-3. 1942-01: Japanese armed forces claims authority over International Settlement (which was mainly under the governance of U.K and U.S prior to this date)
-4. 1945-08-15: Japan surrendered in WWII
-5. 1945-10: most Japanese armed forces withdrawed from Shanghai
+Define: 1. give 1-2 sentence broad overview of China's state of unrest 2.THREE districts in Shanghai: Chinese District, International Settlement, French Concession - who controlled each district and the level of governance each authority have in comparison to Chinese government 3.Outline area (%) of each district (do not get into specifics, put that in Results section)
+
+Important Event Timeline 1. 1937-08-13: Japanese armed forces entered Shanghai 2. 1937-11-12: Japanese armed forces claims occupation of Shanghai --\> ends Chinese district 3. 1942-01: Japanese armed forces claims authority over International Settlement (which was mainly under the governance of U.K and U.S prior to this date) 4. 1945-08-15: Japan surrendered in WWII 5. 1945-10: most Japanese armed forces withdrawed from Shanghai
 
 ## Measurement
-	
-- how population is recorded (not accurate count but by householad then estimates by average)
-- why use population density instead of pure population #
-- how year variables correspond to the timeline (ex. if an event occured in Nov of 1937, would I take valeus of 1937 as a variable for prior to event occurance or after?)
+
+-   how population is recorded (not accurate count but by householad then estimates by average)
+-   why use population density instead of pure population \#
+-   how year variables correspond to the timeline (ex. if an event occured in Nov of 1937, would I take valeus of 1937 as a variable for prior to event occurance or after?)
 
 ## Outcome variables
-- outcome variable is "population change in International Settlement during 1937-1942" measured in population density
 
+-   outcome variable is "population change in International Settlement during 1937-1942" measured in population density
 
-Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
-
-```{r}
+```{r, include = FALSE}
 #| label: fig-planes
 #| fig-cap: Relationship between wing length and width
 #| echo: false
@@ -90,20 +75,13 @@ Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 
 ```
 
-
-
 ## Predictor variables
 
-- most important predictors include time sensitive indicators: Event1 & Event2
+-   most important predictors include time sensitive indicators: Event1 & Event2
 
-Event1: indicator variable for 1937 (1 if year >= 1937 & <= 1941, 0 otherwise)
-- mention a bit about the measurement
+Event1: indicator variable for 1937 (1 if year \>= 1937 & \<= 1941, 0 otherwise) - mention a bit about the measurement
 
-Event2: indicator variable for 1937 (1 if year >= 1941, 0 otherwise)
-- mention a bit about the measurement
-
-
-
+Event2: indicator variable for 1937 (1 if year \>= 1941, 0 otherwise) - mention a bit about the measurement
 
 # Model
 
@@ -115,28 +93,50 @@ Background details and diagnostics are included in [Appendix -@sec-model-details
 
 ## Model set-up
 
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
+$$y_{it}|\mu_{it}, \sigma \sim \mbox{Normal}(\mu_{it}, \sigma)$$
 
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
+$$\mu_{it} = \alpha + \beta_1 \cdot \mbox{cd_occupied}_{it} + \beta_2 \cdot \mbox{french_surrender}_{it} + \beta_3 \cdot \mbox{is_occupied}_{it} + \beta_4 \cdot \mbox{district_type}_{i, IS} +
+\\
+\beta_5 \cdot \mbox{district_type}_{i, FC} + \beta_6 \cdot \mbox{cd_occupied}_{it} \cdot \mbox{district_type}_{i, IS} + 
+\\
+\beta_7 \cdot \mbox{cd_occupied}_{it} \cdot \mbox{district_type}_{i, FC} + \beta_8 \cdot \mbox{french_surrender}_{it} \cdot \mbox{district_type}_{i, IS} + 
+\\
+\beta_9 \cdot \mbox{french_surrender}_{it} \cdot \mbox{district_type}_{i, FC} + 
+\\
+\beta_{10} \cdot \mbox{is_occupied}_{it} \cdot \mbox{district_type}_{i, IS} + \beta_{11} \cdot \mbox{is_occupied}_{it} \cdot \mbox{district_type}_{i, FC}$$
+
+$$\alpha \sim \mbox{Normal}(0, 2.5)$$
+
+$$\beta_k \sim \mbox{Normal}(0, 2.5) \quad \mbox{for } k = 1, ..., 11$$
+
+$$\sigma \sim \mbox{Exponential}(1)$$
+
+**Where**:
+
+-   $y_{i,t}$: Observed population in district i at year t.
+-   $\mbox{cd_occupied}_{i,t}$: Indicator for whether the Chinese-administered district was occupied by Japanese forces in year t (1 if $t \geq 1937$, 0 otherwise).
+-   $\mbox{french_surrender}_{i,t}$: Indicator for the French Surrendering to Germany in 1940, leading to the French Concession rejecting refugees in Shanghai (1 if $t \geq 1940$, 0 otherwise).
+-   $\mbox{is_occupied}_{i,t}$: Indicator for the Japanese occupation of the International Settlement in 1942 (1 if $t \geq 1942$, 0 otherwise).
+-   $\mbox{district_type}_{i, IS}$: Dummy variable for International Settlement districts (1 if i is IS, 0 otherwise).
+-   $\mbox{district_type}_{i, FC}$: Dummy variable for French Concession districts (1 if i is FC, 0 otherwise).
+
+**Interaction Terms**:
+The interaction terms in the model are essential because they capture how the impact of historical events (e.g., the 1937 occupation of Chinese-administered districts, the 1940 refugee rejection in the French Concession, and the 1942 occupation of the International Settlement) varies across different district types. By including interactions between event indicators and district types, the model accounts for district-specific responses to each event, controlling for the fact that the effect of an event on population changes may not be uniform across all districts. For instance, the 1937 occupation might lead to population declines in Chinese-administered districts but population increases in the International Settlement due to refugee influx. These terms ensure that the model can differentiate and estimate the unique effects of each event within each district type, thereby improving precision and interpretability.
+
+-   $\mbox{cd_occupied}_{i,t} \cdot \mbox{district_type}_{i, IS}$: Captures the effect of the 1937 occupation on the International Settlement in comparison to the Chinese-administered district (base district).
+-   $\mbox{cd_occupied}_{i,t} \cdot \mbox{district_type}_{i, FC}$: Captures the effect of the 1937 occupation on the French Concession in comparison to the base district.
+-   $\mbox{french_surrender}_{i,t} \cdot \mbox{district_type}_{i, IS}$: Effect of the 1940 refugee rejection on the International Settlement.
+-   $\mbox{french_surrender}_{i,t} \cdot \mbox{district_type}_{i, FC}$: Effect of the 1940 refugee rejection on the French Concession.
+-   $\mbox{is_occupied}_{i,t} \cdot \mbox{district_type}_{i, IS}$: Effect of the 1942 occupation on the International Settlement.
+-   $\mbox{is_occupied}_{i,t} \cdot \mbox{district_type}_{i, FC}$: Effect of the 1942 occupation on the French Concession.
 
 We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
 
-\[
-Population_{it} = \beta_0 + \beta_1 \cdot cd\_occupied_t + \beta_2 \cdot french\_surrender_t + \beta_3 \cdot is\_occupied_t + \beta_4 \cdot DistrictType_i + \beta_5 \cdot (cd\_occupied_t \times DistrictType_i) + \beta_6 \cdot (french\_surrender_t \times DistrictType_i) + \beta_7\cdot (is\_occupied_t \times DistrictType_i) + \epsilon{it}
-\]
 ### Model justification
 
 We expect a positive relationship between the size of the wings and time spent aloft. In particular...
 
 We can use maths by including latex between dollar signs, for instance $\theta$.
-
 
 # Results
 
@@ -166,55 +166,54 @@ modelsummary::modelsummary(
     "Population model" = did_model
   ),
   statistic = "mad",
-  fmt = 2
+  fmt = 2,
+  metrics = c("R2", "RMSE")
 )
 ```
-
-
-
 
 # Discussion
 
 ## Reason why the French Concession was Exempted from Japanese Occupation
-- During WWII, on the European battlefield, France surrendered to Germany on June 22nd of 1940 (Check this & reference with a credible source). Since Japan was on the same side as Germany during that time, Japanese armed forces decided allow the French Concession to retain its own governance.
-- However, the French Concession is still constantly under the watch of the Japanese forces that has occupied the rest of Shanghai since 1942. 街上不得有侮辱日本的旗帜或者宣言，官方必须积极配合日本统治者进行有利于日本统治的宣传,etc.(can reference to video summary here)
+
+-   During WWII, on the European battlefield, France surrendered to Germany on June 22nd of 1940 (Check this & reference with a credible source). Since Japan was on the same side as Germany during that time, Japanese armed forces decided allow the French Concession to retain its own governance.
+-   However, the French Concession is still constantly under the watch of the Japanese forces that has occupied the rest of Shanghai since 1942. 街上不得有侮辱日本的旗帜或者宣言，官方必须积极配合日本统治者进行有利于日本统治的宣传,etc.(can reference to video summary here)
 
 ## Refugees from outside of Shanghai Province
-- industrialization was not so popular back in the 1930s, many provinces are still mostly rural. But warfare messed with the land and the yields, causing many farmers to starve and ultimately have to seek refugee (find job) in industrialized city (where income is not dependent on land yield)
-- many people flooded to Shanghai for this reason (can insert calculation in data table 20 from reference book here)
+
+-   industrialization was not so popular back in the 1930s, many provinces are still mostly rural. But warfare messed with the land and the yields, causing many farmers to starve and ultimately have to seek refugee (find job) in industrialized city (where income is not dependent on land yield)
+-   many people flooded to Shanghai for this reason (can insert calculation in data table 20 from reference book here)
 
 ### Job Oppurtunities in Shanghai
-Aside from the instability caused by the Japanese armed forces, there are a few other reasons for Chinese population to move into the international settlement & French Concession.
-1. Job opportunities
-- Heart of Shanghai city in the 1930-1940s, high pop density lead to boom of economy = more job opportunities
-- many factories are located with the settlements (less so in concession)
+
+Aside from the instability caused by the Japanese armed forces, there are a few other reasons for Chinese population to move into the international settlement & French Concession. 1. Job opportunities - Heart of Shanghai city in the 1930-1940s, high pop density lead to boom of economy = more job opportunities - many factories are located with the settlements (less so in concession)
 
 ### Barrier to Entry in Job Market
-2. Barrier to Entry for certain job types
-- 旧时候 -- 通讯还没有那么发达的时候，人们都很团结。那个时候同乡会的力量很强大。在外省，从同一个省来的漂泊者会互相帮扶着垄断一个城市的某种行业。例如，在旧上海，要做酒店生意的话你就必须是湖南人，给人做洗脚生意的肯定是苏北人。。。
+
+2.  Barrier to Entry for certain job types
+
+-   旧时候 -- 通讯还没有那么发达的时候，人们都很团结。那个时候同乡会的力量很强大。在外省，从同一个省来的漂泊者会互相帮扶着垄断一个城市的某种行业。例如，在旧上海，要做酒店生意的话你就必须是湖南人，给人做洗脚生意的肯定是苏北人。。。
 
 ## Instability after Japanese Occupation ends in WWII: Chinese Civil War
-- after the Japanese armed forces withdrawed from Shanghai, what follows is not recovery and rest for the local population
-- Competition for power within China's 2 political parties caused full-scale political warfare, now known as the *Chinese Civil War*
-- unlike Western political parties, Chinese political parties in the 1900s are more like parties of a throne. They each have their own ideology and an armed forces that follow. Most of all of the provinces are effected by this internal warfare, which ended in 1949 as 国民党 lost and withdrawed to Taiwan.
+
+-   after the Japanese armed forces withdrawed from Shanghai, what follows is not recovery and rest for the local population
+-   Competition for power within China's 2 political parties caused full-scale political warfare, now known as the *Chinese Civil War*
+-   unlike Western political parties, Chinese political parties in the 1900s are more like parties of a throne. They each have their own ideology and an armed forces that follow. Most of all of the provinces are effected by this internal warfare, which ended in 1949 as 国民党 lost and withdrawed to Taiwan.
 
 ## Weaknesses and next steps
 
 ### Data Measurement Weaknesses
-- data was recorded during wartime, many numbers were missing
-- base unit for population records is not ppl, it is instead "household". # of ppl in a household is estimated based on historical data
-- many people chose to not report or partially report numbers due to convience or economic reasons, data may not be accurate
+
+-   data was recorded during wartime, many numbers were missing
+-   base unit for population records is not ppl, it is instead "household". \# of ppl in a household is estimated based on historical data
+-   many people chose to not report or partially report numbers due to convience or economic reasons, data may not be accurate
 
 ### Next Steps
-
-
 
 \newpage
 
 \appendix
 
-# Appendix {-}
-
+# Appendix {.unnumbered}
 
 # Additional data details
 
@@ -224,7 +223,7 @@ Aside from the instability caused by the Japanese armed forces, there are a few 
 
 In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
 
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
+In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows...
 
 ```{r}
 #| eval: true
@@ -236,11 +235,14 @@ In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. Th
 #| fig-cap: "Examining how the model fits, and is affected by, the data"
 #| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
 
-pp_check(first_model) +
+model_format <- read_parquet(file = here::here("data/02-analysis_data/model_format.parquet"))
+
+
+pp_check(did_model) +
   theme_classic() +
   theme(legend.position = "bottom")
 
-posterior_vs_prior(first_model) +
+posterior_vs_prior(did_model) +
   theme_minimal() +
   scale_color_brewer(palette = "Set1") +
   theme(legend.position = "bottom") +
@@ -263,16 +265,13 @@ posterior_vs_prior(first_model) +
 #| fig-subcap: ["Trace plot", "Rhat plot"]
 #| layout-ncol: 2
 
-plot(first_model, "trace")
+plot(did_model, "trace")
 
-plot(first_model, "rhat")
+plot(did_model, "rhat")
 ```
 
 
 
 \newpage
 
-
 # References
-
-
