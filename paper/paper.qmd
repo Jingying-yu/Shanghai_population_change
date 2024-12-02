@@ -1,5 +1,5 @@
 ---
-title: "My title"
+title: "WWII Events Reduce Population in One Shanghai District While Increasing It in Others"
 subtitle: "Impact Analysis of Japanese Occupation on Population Shifts Across Shanghai’s Districts During WWII"
 author: 
   - Sandy Yu
@@ -164,7 +164,7 @@ $$\beta_k \sim \text{Normal}(0, 2.5) \quad \text{for } k = 1, ..., 12$$
 
 $$\sigma \sim \text{Exponential}(1)$$
 
-Where:
+**Where**:
 
 -   $y_i$: Observed population in district i at year t.
 -   $\alpha$: The intercept for when all variables take value of 0.
@@ -177,7 +177,7 @@ Where:
 -   $\beta_i\ where\ i = 7, ..., 12$: coefficients for interaction terms below. Each term ajusts the impact of a historical events on a district-specific basis.
 
 
-Interaction Terms:
+**Interaction Terms**:
 
 The interaction terms in the model are essential because they capture how the impact of historical events (e.g., the 1937 occupation of Chinese-administered districts, the 1940 refugee rejection in the French Concession, and the 1942 occupation of the International Settlement) varies across different district types. By including interactions between event indicators and district types, the model accounts for district-specific responses to each event, controlling for the fact that the effect of an event on population changes may not be uniform across all districts. For instance, the 1937 occupation might lead to population declines in Chinese-administered districts but population increases in the International Settlement due to refugee influx. These terms ensure that the model can differentiate and estimate the unique effects of each event within each district type, thereby improving precision and interpretability.
 
@@ -195,6 +195,8 @@ We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use
 We expect a positive relationship between the size of the wings and time spent aloft. In particular...
 
 We can use maths by including latex between dollar signs, for instance $\theta$.
+
+
 
 # Results
 
@@ -439,7 +441,10 @@ plot(did_model, "trace")
 plot(did_model, "rhat")
 ```
 
-# Appendix B: Idealized Survey Methodology
+
+\newpage
+
+# Idealized Survey Methodology
 
 This appendix presents an idealized design for a population sampling survey, assuming that a data-recorder has unlimited time and authority to collect data within the historical timeframe of 1936–1942. The proposed methodology outlines a systematic approach to gathering detailed population data from Shanghai’s districts during pivotal wartime events, with considerations for the practical constraints and technology available during that period. While acknowledging the inherent challenges of conducting such a survey, this design aims to provide a comprehensive framework for understanding population dynamics within the Chinese-administered areas, International Settlement, and French Concession.
 
