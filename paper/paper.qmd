@@ -19,9 +19,25 @@ bibliography: references.bib
 
 library(tidyverse)
 library(arrow)
+library(readr)
 library(knitr)
+library(kableExtra)
 library(modelsummary)
 library(rstanarm)
+library(dplyr)
+library(broom.mixed)
+```
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+
+calibration_percent <- read_parquet(file = here::here("data/02-analysis_data/calibration_percent.parquet"))
+year_refugee_summary <- read_parquet(file = here::here("data/02-analysis_data/year_refugee_summary.parquet"))
+combined_data <- read_parquet(file = here::here("data/02-analysis_data/combined_data.parquet"))
+model_format <- read_parquet(file = here::here("data/02-analysis_data/model_format.parquet"))
+did_model <- readRDS(file = here::here("models/did_model.rds"))
 ```
 
 # Introduction
@@ -45,43 +61,94 @@ We use the statistical programming language R [@citeR].... Our data [@shelter]..
 ## Data Sources
 
 -   talk about where the data in my primary reference book is gathered
--   mentions the credibility of source and unstability of recording instrument & methodology
+-   mentions the credibility of source and instability of recording instrument & methodology
 
 ## Historical Background
 
-Place: Shanghai, China When: 1936-1942 Who: Chinese population in Shanghai
+Place: Shanghai, China
+
+When: 1936-1942
+
+Who: Chinese population in Shanghai
 
 Define: 1. give 1-2 sentence broad overview of China's state of unrest 2.THREE districts in Shanghai: Chinese District, International Settlement, French Concession - who controlled each district and the level of governance each authority have in comparison to Chinese government 3.Outline area (%) of each district (do not get into specifics, put that in Results section)
 
-Important Event Timeline 1. 1937-08-13: Japanese armed forces entered Shanghai 2. 1937-11-12: Japanese armed forces claims occupation of Shanghai --\> ends Chinese district 3. 1942-01: Japanese armed forces claims authority over International Settlement (which was mainly under the governance of U.K and U.S prior to this date) 4. 1945-08-15: Japan surrendered in WWII 5. 1945-10: most Japanese armed forces withdrawed from Shanghai
+Important Event Timeline
 
-## Measurement
+1\. 1937-08-13: Japanese armed forces entered Shanghai
 
--   how population is recorded (not accurate count but by householad then estimates by average)
--   why use population density instead of pure population \#
--   how year variables correspond to the timeline (ex. if an event occured in Nov of 1937, would I take valeus of 1937 as a variable for prior to event occurance or after?)
+2\. 1937-11-12: Japanese armed forces claims occupation of Shanghai --\> ends Chinese district
 
-## Outcome variables
+1940-06-22: France surrendered to Germany --> French Concession stopped taking refugees
 
--   outcome variable is "population change in International Settlement during 1937-1942" measured in population density
+3\. 1942-01: Japanese armed forces claims authority over International Settlement (which was mainly under the governance of U.K and U.S prior to this date)
 
-```{r, include = FALSE}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
+4\. 1945-08-15: Japan surrendered in WWII
+
+5\. 1945-10: most Japanese armed forces withdrew from Shanghai
+
+## Measurement & Methodology
+
+-   how population is recorded
+-   Why choose 1936 - 1942 (ex. if an event occurred in Nov of 1937, would I take values of 1937 as a variable for prior to event occurrence or after?)
+
+Survey Difficulties - Population Volatility caused by Warfare: Population is extreme volatile within this time period, population shifts constantly as 战况 proceed - Regional Recording Limitations: Survey response collect difficulty varies between districts. - Resistance due to Political Risk
+
+## Variables of Interest
+
+```{r}
 #| echo: false
+#| eval: true
+#| label: tbl-outcome_variable
+#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
 #| warning: false
 #| message: false
 
-
+knitr::kable(combined_data, col.names = c("Year", "Pop CHN District", "Pop IS", "Pop FC"), align = c("c", "c", "c", "c"))
 ```
 
-## Predictor variables
+### Outcome variable
 
--   most important predictors include time sensitive indicators: Event1 & Event2
+- outcome variable is *population*
 
-Event1: indicator variable for 1937 (1 if year \>= 1937 & \<= 1941, 0 otherwise) - mention a bit about the measurement
+### Predictor variables
+Time variable: year
+Observations used in modelling and other analysis in this paper is ranged between 1936 to 1942. No observation is selected before 1936 as the growth pattern varies significantly from the event of our interest (Japanese occupation of Shanghai's different districts), and no value is elected beyond 1942 due to data constraints. No annual population records exists on a district bases beyond 1942. Foreign districts 解散 in 1949 as new political party came to power and the People's Republic of China was declared.
 
-Event2: indicator variable for 1937 (1 if year \>= 1941, 0 otherwise) - mention a bit about the measurement
+#### Binary Indicators
+District indicators:
+- Variable *district_is* abd *district_fc* are two binary variable used to indicate the district identity of an observation.
+There are 3 possible district identity in Shanghai during 1930s-40s: Chinese-administrated District, International Settlement, and French Concession.
+
+The Chinese-administrated District is governed by local Chinese authority. Land type in this area is primary rural, most of the local population are farmers. Percentage of foreign (out-of-province) immigrants or refugees is low. (@sh) In this analysis paper, Chinese-administrated District takes value of *district_is = 0* and *district_fc = 0* (it is neither International Settlement nor French Concession).
+
+The International Settlement district is a generalized term for section of lands that allowed the occupation of foreign (non-Chinese) residence. Foreigners in Shanghai were not allow to reside in areas outside of the bounds of this district. Governance power of foreign population within the district -- including the policing, taxing, etc, are transferred to foreign authorities. This district takes up most of the central-city in Shanghai during the 1930s-40s, with foreign investment attracting many business opportunities and subsequently job opportunities. Due to the complicated political authorities within the district, the part of Shanghai remains initially untouched by the Japanese forces as the entered Shanghai's Chinese-administrated District. International Settlement district takes the value of *district_is = 1* and *district_fc = 0* in this paper.
+
+French Concession district is a land district given solely to the French. French residency are given the authorization to self-govern within this area. Due to political reasons on the Western battlefield, this district remains untouched by the Japanese forces all the way until they withdrew from Shanghai. The French Concesion district takes value of *district_is = 0* and *district_fc = 1* for all analysis in the paper.
+
+
+Historic Event indicators:
+- *cd_occupied*, *french_surrender*, and *is_occupied* are binary variables that mark the whether or not a major historic event that may have impacted Shanghai's population during the observation period (1936-1942) has occured yet.
+1. The Japanese armed forces declared occupation of the Chinese-administrated district on 1937-11-12. With expectation that Shanghai's population will internally shift out of the Chinese-administrated district, the binary variable *cd_occupied* is used to measure the impact of this event on the population change in Shanghai.
+2. As WWII impacted the Eastern globe, on the primary battlefield (Western Battlefield), France surrendered to Germany on 22 June 1940. Since Japan sided with Germany in WWII, France's whiteflagging to Germany led to Shanghai's Japanese forces promising not to invade the French Concession on the condition that the district stop taking refugees and support Japanese governance. The paper uses the binary variable *french_surrender* to evaluate the impact this event has on the overall population in Shanghai.
+3. In January of 1942, the Japanese forces occupied the International Settlement. Local authority handed over its governing power to the invading forces. This event's impact on Shanghai's population is measuring using the binary variable *is_occupied*.
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-d_variables
+#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| warning: false
+#| message: false
+
+# Select the rows you want
+sliced_table <- model_format |>
+  select(year, population, district_is, district_fc, cd_occupied, french_surrender, is_occupied) |>
+  slice(c(3, 4, 8, 15, 16, 20))
+
+knitr::kable(sliced_table, col.names = c("Year", "Population", "district_is", "district_fc", "cd_occupied", "french_surrender", "is_occupied"), align = c("c", "c", "c", "c", "c", "c", "c"))
+
+```
 
 # Model
 
@@ -89,46 +156,37 @@ The goal of our modelling strategy is to evaluate the impact of 2 historical eve
 
 Here we briefly describe the Difference-in-Difference analysis model used to investigate the impact of the Japanese forces taking over the Chinese district and International Settlement in November 1937 and December 1941 on population shift between different Districts in Shanghai.
 
-Background details and diagnostics are included in [Appendix -@sec-model-details].
+Background details and diagnostics are included in Appendix \[@sec-model-details\].
 
 ## Model set-up
 
-$$y_{it}|\mu_{it}, \sigma \sim \mbox{Normal}(\mu_{it}, \sigma)$$
+$$y_i|\mu_i, \sigma \sim \text{Normal}(\mu_{i,t}, \sigma)$$
 
-$$\mu_{it} = \alpha + \beta_1 \cdot \mbox{cd_occupied}_{it} + \beta_2 \cdot \mbox{french_surrender}_{it} + \beta_3 \cdot \mbox{is_occupied}_{it} + \beta_4 \cdot \mbox{district_type}_{i, IS} +
-\\
-\beta_5 \cdot \mbox{district_type}_{i, FC} + \beta_6 \cdot \mbox{cd_occupied}_{it} \cdot \mbox{district_type}_{i, IS} + 
-\\
-\beta_7 \cdot \mbox{cd_occupied}_{it} \cdot \mbox{district_type}_{i, FC} + \beta_8 \cdot \mbox{french_surrender}_{it} \cdot \mbox{district_type}_{i, IS} + 
-\\
-\beta_9 \cdot \mbox{french_surrender}_{it} \cdot \mbox{district_type}_{i, FC} + 
-\\
-\beta_{10} \cdot \mbox{is_occupied}_{it} \cdot \mbox{district_type}_{i, IS} + \beta_{11} \cdot \mbox{is_occupied}_{it} \cdot \mbox{district_type}_{i, FC}$$
+$$\alpha \sim \text{Normal}(0, 2.5)$$
 
-$$\alpha \sim \mbox{Normal}(0, 2.5)$$
+$$\beta_k \sim \text{Normal}(0, 2.5) \quad \text{for } k = 1, ..., 11$$
 
-$$\beta_k \sim \mbox{Normal}(0, 2.5) \quad \mbox{for } k = 1, ..., 11$$
+$$\sigma \sim \text{Exponential}(1)$$
 
-$$\sigma \sim \mbox{Exponential}(1)$$
+Where:
 
-**Where**:
+-   $y_i$: Observed population in district i at year t.
+-   $\text{cd_occupied}$: Indicator for whether the Chinese-administered district was occupied by Japanese forces in year t (1 if $t \geq 1937$, 0 otherwise).
+-   $\text{french_surrender}$: Indicator for the French Surrendering to Germany in 1940, leading to the French Concession rejecting refugees in Shanghai (1 if $t \geq 1940$, 0 otherwise).
+-   $\text{is_occupied}$: Indicator for the Japanese occupation of the International Settlement in 1942 (1 if $t \geq 1942$, 0 otherwise).
+-   $\text{district_type}$: Dummy variable for International Settlement districts (1 if $i$ is IS, 0 otherwise).
+-   $\text{district_type}$: Dummy variable for French Concession districts (1 if $i$ is FC, 0 otherwise).
 
--   $y_{i,t}$: Observed population in district i at year t.
--   $\mbox{cd_occupied}_{i,t}$: Indicator for whether the Chinese-administered district was occupied by Japanese forces in year t (1 if $t \geq 1937$, 0 otherwise).
--   $\mbox{french_surrender}_{i,t}$: Indicator for the French Surrendering to Germany in 1940, leading to the French Concession rejecting refugees in Shanghai (1 if $t \geq 1940$, 0 otherwise).
--   $\mbox{is_occupied}_{i,t}$: Indicator for the Japanese occupation of the International Settlement in 1942 (1 if $t \geq 1942$, 0 otherwise).
--   $\mbox{district_type}_{i, IS}$: Dummy variable for International Settlement districts (1 if i is IS, 0 otherwise).
--   $\mbox{district_type}_{i, FC}$: Dummy variable for French Concession districts (1 if i is FC, 0 otherwise).
+Interaction Terms:
 
-**Interaction Terms**:
 The interaction terms in the model are essential because they capture how the impact of historical events (e.g., the 1937 occupation of Chinese-administered districts, the 1940 refugee rejection in the French Concession, and the 1942 occupation of the International Settlement) varies across different district types. By including interactions between event indicators and district types, the model accounts for district-specific responses to each event, controlling for the fact that the effect of an event on population changes may not be uniform across all districts. For instance, the 1937 occupation might lead to population declines in Chinese-administered districts but population increases in the International Settlement due to refugee influx. These terms ensure that the model can differentiate and estimate the unique effects of each event within each district type, thereby improving precision and interpretability.
 
--   $\mbox{cd_occupied}_{i,t} \cdot \mbox{district_type}_{i, IS}$: Captures the effect of the 1937 occupation on the International Settlement in comparison to the Chinese-administered district (base district).
--   $\mbox{cd_occupied}_{i,t} \cdot \mbox{district_type}_{i, FC}$: Captures the effect of the 1937 occupation on the French Concession in comparison to the base district.
--   $\mbox{french_surrender}_{i,t} \cdot \mbox{district_type}_{i, IS}$: Effect of the 1940 refugee rejection on the International Settlement.
--   $\mbox{french_surrender}_{i,t} \cdot \mbox{district_type}_{i, FC}$: Effect of the 1940 refugee rejection on the French Concession.
--   $\mbox{is_occupied}_{i,t} \cdot \mbox{district_type}_{i, IS}$: Effect of the 1942 occupation on the International Settlement.
--   $\mbox{is_occupied}_{i,t} \cdot \mbox{district_type}_{i, FC}$: Effect of the 1942 occupation on the French Concession.
+-   $\text{cd_occupied} \cdot \text{district_type}$: Captures the effect of the 1937 occupation on the International Settlement in comparison to the Chinese-administered district (base district).
+-   $\text{cd_occupied} \cdot \text{district_type}$: Captures the effect of the 1937 occupation on the French Concession in comparison to the base district.
+-   $\text{french_surrender} \cdot \text{district_type}$: Effect of the 1940 refugee rejection on the International Settlement.
+-   $\text{french_surrender} \cdot \text{district_type}$: Effect of the 1940 refugee rejection on the French Concession.
+-   $\text{is_occupied} \cdot \text{district_type}$: Effect of the 1942 occupation on the International Settlement.
+-   $\text{is_occupied} \cdot \text{district_type}$: Effect of the 1942 occupation on the French Concession.
 
 We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
 
@@ -140,7 +198,38 @@ We can use maths by including latex between dollar signs, for instance $\theta$.
 
 # Results
 
-Our results are summarized in @tbl-modelresults.
+-   Data Trend Visualization
+
+```{r}
+#| label: fig-pop
+#| fig-cap: Population in Shanghai between 1936 - 1942
+#| echo: false
+#| warning: false
+#| message: false
+
+# Create the bar chart with a trend line
+ggplot(model_format, aes(x = year, y = population, fill = district_type, color = district_type)) +
+  geom_bar(stat = "identity", position = "dodge", alpha = 0.7) +  # Bar chart with transparency
+  geom_line(aes(group = district_type), size = 1) +  # Add trend line
+  geom_point(size = 2) +  # Add points on the trend line
+  scale_fill_brewer(palette = "Paired") +  # Use ColorBrewer palette for fill
+  scale_color_brewer(palette = "Paired") +  # Use ColorBrewer palette for trend line
+  labs(
+    title = "Population In Shanghai between 1936-1942",
+    x = "Year",
+    y = "Population",
+    fill = "District Type",
+    color = "District Type"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    text = element_text(size = 12),
+    plot.title = element_text(hjust = 0.5)
+  )
+```
+
+-   Model results are summarized in @tbl-modelresults in Appendix (@sec-model-details).
 
 ```{r}
 #| echo: false
@@ -148,30 +237,81 @@ Our results are summarized in @tbl-modelresults.
 #| warning: false
 #| message: false
 
-library(rstanarm)
-
-did_model <-
-  readRDS(file = here::here("models/did_model.rds"))
+# Extract coefficients and statistics as a data frame
+model_summary <- broom.mixed::tidy(did_model)
 ```
 
+#### District Impact on Population
 ```{r}
 #| echo: false
 #| eval: true
-#| label: tbl-modelresults
+#| label: tbl-district
 #| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
 #| warning: false
 
-modelsummary::modelsummary(
-  list(
-    "Population model" = did_model
-  ),
-  statistic = "mad",
-  fmt = 2,
-  metrics = c("R2", "RMSE")
-)
+
+# Filter for the specific coefficient you want (e.g., "cd_occupied")
+d_types <- model_summary |>
+  filter(term %in% c("(Intercept)", "district_is", "district_fc")) |>
+  mutate(
+    estimate = round(estimate, 2),
+    std.error = round(std.error, 2))
+
+
+knitr::kable(d_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c"))
 ```
 
+#### Historical Events
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-events
+#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| warning: false
+
+
+# Filter for the specific coefficient you want (e.g., "cd_occupied")
+event_types <- model_summary |>
+  filter(term %in% c("cd_occupied", "french_surrender", "is_occupied")) |>
+  mutate(
+    estimate = round(estimate, 2),
+    std.error = round(std.error, 2))
+
+knitr::kable(event_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c"))
+```
+
+#### Historic Events' Impact on Each District
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-events_district
+#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| warning: false
+
+
+# Filter for the specific coefficient you want (e.g., "cd_occupied")
+impact_types <- model_summary[7:12, ] |>
+  mutate(estimate = round(estimate, 2),
+    std.error = round(std.error, 2))
+
+print(impact_types)
+knitr::kable(impact_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c", "c", "c", "c"))
+```
+
+
+
 # Discussion
+
+## Interpretation of the Event Impacts
+
+### Impact of Occupation in Chinese District
+
+
+### Impact of French Surrendering to Germany on Shanghai
+
+### Impact of Occupation in International Settlement
+
+
 
 ## Reason why the French Concession was Exempted from Japanese Occupation
 
@@ -218,6 +358,36 @@ Aside from the instability caused by the Japanese armed forces, there are a few 
 # Additional data details
 
 # Model details {#sec-model-details}
+
+## Model Summary Table
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+library(rstanarm)
+
+did_model <-
+  readRDS(file = here::here("models/did_model.rds"))
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-modelresults
+#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| warning: false
+
+modelsummary::modelsummary(
+  list(
+    "Population model" = did_model
+  ),
+  statistic = "mad",
+  fmt = 2,
+  metrics = c("R2", "RMSE")
+)
+```
 
 ## Posterior predictive check
 
@@ -269,8 +439,6 @@ plot(did_model, "trace")
 
 plot(did_model, "rhat")
 ```
-
-
 
 \newpage
 

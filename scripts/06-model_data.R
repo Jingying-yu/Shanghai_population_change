@@ -19,15 +19,24 @@ model_format <- read_parquet("data/02-analysis_data/model_format.parquet")
 ### Model data ####
 
 did_model <- stan_glm(
-  population ~ cd_occupied * district_type + 
-    french_surrender * district_type + 
-    is_occupied * district_type,
+  population ~ year + district_is + district_fc + cd_occupied * district_is + 
+    cd_occupied * district_fc +
+    french_surrender * district_is + 
+    french_surrender * district_fc +
+    is_occupied * district_is + 
+    is_occupied * district_fc,
   data = model_format,
   family = gaussian(),  # Continuous dependent variable
-  prior = normal(0, 10),  # Weakly informative prior
-  prior_intercept = normal(0, 10),
-  chains = 4, iter = 2000, seed = 123
+  prior = normal(location = 0, scale = 2.5, autoscale = TRUE),
+  prior_intercept = normal(0, 2.5, autoscale = TRUE),
+  prior_aux = exponential(rate = 1, autoscale = TRUE),
+  seed = 853
 )
+
+
+
+
+
 
 
 #### Save model ####

@@ -101,7 +101,20 @@
 \newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
 \usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
 \usepackage{tabularray}
 \usepackage[normalem]{ulem}
 \usepackage{graphicx}
@@ -191,14 +204,14 @@ https://github.com/Jingying-yu/Shanghai\_population\_change}}
 \subtitle{Impact Analysis of Japanese Occupation on Population Shifts
 Across Shanghai's Districts During WWII}
 \author{Sandy Yu}
-\date{November 30, 2024}
+\date{December 1, 2024}
 
 \begin{document}
 \maketitle
 \begin{abstract}
 First sentence. Second sentence. Third sentence. Fourth sentence.
 \end{abstract}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, breakable, frame hidden, boxrule=0pt, interior hidden, borderline west={3pt}{0pt}{shadecolor}, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, frame hidden, breakable, sharp corners, interior hidden]}{\end{tcolorbox}}\fi
 
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
@@ -232,15 +245,18 @@ Alexander (2023), we consider\ldots{}
 \item
   talk about where the data in my primary reference book is gathered
 \item
-  mentions the credibility of source and unstability of recording
+  mentions the credibility of source and instability of recording
   instrument \& methodology
 \end{itemize}
 
 \hypertarget{historical-background}{%
 \subsection{Historical Background}\label{historical-background}}
 
-Place: Shanghai, China When: 1936-1942 Who: Chinese population in
-Shanghai
+Place: Shanghai, China
+
+When: 1936-1942
+
+Who: Chinese population in Shanghai
 
 Define: 1. give 1-2 sentence broad overview of China's state of unrest
 2.THREE districts in Shanghai: Chinese District, International
@@ -249,55 +265,91 @@ level of governance each authority have in comparison to Chinese
 government 3.Outline area (\%) of each district (do not get into
 specifics, put that in Results section)
 
-Important Event Timeline 1. 1937-08-13: Japanese armed forces entered
-Shanghai 2. 1937-11-12: Japanese armed forces claims occupation of
-Shanghai --\textgreater{} ends Chinese district 3. 1942-01: Japanese
-armed forces claims authority over International Settlement (which was
-mainly under the governance of U.K and U.S prior to this date) 4.
-1945-08-15: Japan surrendered in WWII 5. 1945-10: most Japanese armed
-forces withdrawed from Shanghai
+Important Event Timeline
 
-\hypertarget{measurement}{%
-\subsection{Measurement}\label{measurement}}
+1. 1937-08-13: Japanese armed forces entered Shanghai
+
+2. 1937-11-12: Japanese armed forces claims occupation of Shanghai
+--\textgreater{} ends Chinese district
+
+3. 1942-01: Japanese armed forces claims authority over International
+Settlement (which was mainly under the governance of U.K and U.S prior
+to this date)
+
+4. 1945-08-15: Japan surrendered in WWII
+
+5. 1945-10: most Japanese armed forces withdrew from Shanghai
+
+\hypertarget{measurement-methodology}{%
+\subsection{Measurement \& Methodology}\label{measurement-methodology}}
 
 \begin{itemize}
 \tightlist
 \item
-  how population is recorded (not accurate count but by householad then
-  estimates by average)
+  how population is recorded
 \item
-  why use population density instead of pure population \#
-\item
-  how year variables correspond to the timeline (ex. if an event occured
-  in Nov of 1937, would I take valeus of 1937 as a variable for prior to
-  event occurance or after?)
+  Why choose 1936 - 1942 (ex. if an event occurred in Nov of 1937, would
+  I take values of 1937 as a variable for prior to event occurrence or
+  after?)
 \end{itemize}
 
-\hypertarget{outcome-variables}{%
-\subsection{Outcome variables}\label{outcome-variables}}
+Survey Difficulties - Population Volatility caused by Warfare:
+Population is extreme volatile within this time period, population
+shifts constantly as 战况 proceed - Regional Recording Limitations:
+Survey response collect difficulty varies between districts. -
+Resistance due to Political Risk
+
+\hypertarget{variables-of-interest}{%
+\subsection{Variables of Interest}\label{variables-of-interest}}
+
+\hypertarget{tbl-outcome_variable}{}
+\begin{longtable}[]{@{}cccc@{}}
+\caption{\label{tbl-outcome_variable}Explanatory models of flight time
+based on wing width and wing length}\tabularnewline
+\toprule\noalign{}
+Year & Pop CHN District & Pop IS & Pop FC \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Year & Pop CHN District & Pop IS & Pop FC \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1936 & 2155717 & 1180969 & 477629 \\
+1937 & 2155717 & 1218630 & 477629 \\
+1938 & 2074693 & 1272552 & 504731 \\
+1939 & 2098331 & 1257703 & 495942 \\
+1940 & 1479726 & 1233394 & 477629 \\
+1941 & 957339 & 446692 & 835523 \\
+1942 & 1049403 & 1585673 & 854380 \\
+\end{longtable}
+
+\hypertarget{outcome-variable}{%
+\subsubsection{Outcome variable}\label{outcome-variable}}
 
 \begin{itemize}
 \tightlist
 \item
-  outcome variable is ``population change in International Settlement
-  during 1937-1942'' measured in population density
+  outcome variable is \emph{population} with subscript of time (t) and
+  district (i), where time range is between 1936-1942, and district is
+  either: Chinese-administrated District, International Settlement, and
+  French Concession. ``population change in International Settlement
+  during 1937-1942'' measured in \# of persons
 \end{itemize}
 
 \hypertarget{predictor-variables}{%
-\subsection{Predictor variables}\label{predictor-variables}}
+\subsubsection{Predictor variables}\label{predictor-variables}}
 
 \begin{itemize}
 \tightlist
 \item
-  most important predictors include time sensitive indicators: Event1 \&
-  Event2
+  Event indicators (dummy variables)
 \end{itemize}
 
-Event1: indicator variable for 1937 (1 if year \textgreater= 1937 \&
-\textless= 1941, 0 otherwise) - mention a bit about the measurement
+\begin{table}
 
-Event2: indicator variable for 1937 (1 if year \textgreater= 1941, 0
-otherwise) - mention a bit about the measurement
+\end{table}
 
 \hypertarget{model}{%
 \section{Model}\label{model}}
@@ -311,94 +363,84 @@ Chinese district and International Settlement in November 1937 and
 December 1941 on population shift between different Districts in
 Shanghai.
 
-Background details and diagnostics are included in
-Appendix~\ref{sec-model-details}.
+Background details and diagnostics are included in Appendix
+{[}Section~\ref{sec-model-details}{]}.
 
 \hypertarget{model-set-up}{%
 \subsection{Model set-up}\label{model-set-up}}
 
-\[y_{it}|\mu_{it}, \sigma \sim \mbox{Normal}(\mu_{it}, \sigma)\]
+\[y_i|\mu_i, \sigma \sim \text{Normal}(\mu_{i,t}, \sigma)\]
 
-\[\mu_{it} = \alpha + \beta_1 \cdot \mbox{cd_occupied}_{it} + \beta_2 \cdot \mbox{french_surrender}_{it} + \beta_3 \cdot \mbox{is_occupied}_{it} + \beta_4 \cdot \mbox{district_type}_{i, IS} +
-\\
-\beta_5 \cdot \mbox{district_type}_{i, FC} + \beta_6 \cdot \mbox{cd_occupied}_{it} \cdot \mbox{district_type}_{i, IS} + 
-\\
-\beta_7 \cdot \mbox{cd_occupied}_{it} \cdot \mbox{district_type}_{i, FC} + \beta_8 \cdot \mbox{french_surrender}_{it} \cdot \mbox{district_type}_{i, IS} + 
-\\
-\beta_9 \cdot \mbox{french_surrender}_{it} \cdot \mbox{district_type}_{i, FC} + 
-\\
-\beta_{10} \cdot \mbox{is_occupied}_{it} \cdot \mbox{district_type}_{i, IS} + \beta_{11} \cdot \mbox{is_occupied}_{it} \cdot \mbox{district_type}_{i, FC}\]
+\[\alpha \sim \text{Normal}(0, 2.5)\]
 
-\[\alpha \sim \mbox{Normal}(0, 2.5)\]
+\[\beta_k \sim \text{Normal}(0, 2.5) \quad \text{for } k = 1, ..., 11\]
 
-\[\beta_k \sim \mbox{Normal}(0, 2.5) \quad \mbox{for } k = 1, ..., 11\]
+\[\sigma \sim \text{Exponential}(1)\]
 
-\[\sigma \sim \mbox{Exponential}(1)\]
-
-\textbf{Where}:
+Where:
 
 \begin{itemize}
 \tightlist
 \item
-  \(y_{i,t}\): Observed population in district i at year t.
+  \(y_i\): Observed population in district i at year t.
 \item
-  \(\mbox{cd_occupied}_{i,t}\): Indicator for whether the
-  Chinese-administered district was occupied by Japanese forces in year
-  t (1 if \(t \geq 1937\), 0 otherwise).
+  \(\text{cd_occupied}\): Indicator for whether the Chinese-administered
+  district was occupied by Japanese forces in year t (1 if
+  \(t \geq 1937\), 0 otherwise).
 \item
-  \(\mbox{french_surrender}_{i,t}\): Indicator for the French
-  Surrendering to Germany in 1940, leading to the French Concession
-  rejecting refugees in Shanghai (1 if \(t \geq 1940\), 0 otherwise).
+  \(\text{french_surrender}\): Indicator for the French Surrendering to
+  Germany in 1940, leading to the French Concession rejecting refugees
+  in Shanghai (1 if \(t \geq 1940\), 0 otherwise).
 \item
-  \(\mbox{is_occupied}_{i,t}\): Indicator for the Japanese occupation of
-  the International Settlement in 1942 (1 if \(t \geq 1942\), 0
-  otherwise).
+  \(\text{is_occupied}\): Indicator for the Japanese occupation of the
+  International Settlement in 1942 (1 if \(t \geq 1942\), 0 otherwise).
 \item
-  \(\mbox{district_type}_{i, IS}\): Dummy variable for International
-  Settlement districts (1 if i is IS, 0 otherwise).
+  \(\text{district_type}\): Dummy variable for International Settlement
+  districts (1 if \(i\) is IS, 0 otherwise).
 \item
-  \(\mbox{district_type}_{i, FC}\): Dummy variable for French Concession
-  districts (1 if i is FC, 0 otherwise).
+  \(\text{district_type}\): Dummy variable for French Concession
+  districts (1 if \(i\) is FC, 0 otherwise).
 \end{itemize}
 
-\textbf{Interaction Terms}: The interaction terms in the model are
-essential because they capture how the impact of historical events
-(e.g., the 1937 occupation of Chinese-administered districts, the 1940
-refugee rejection in the French Concession, and the 1942 occupation of
-the International Settlement) varies across different district types. By
-including interactions between event indicators and district types, the
-model accounts for district-specific responses to each event,
-controlling for the fact that the effect of an event on population
-changes may not be uniform across all districts. For instance, the 1937
-occupation might lead to population declines in Chinese-administered
-districts but population increases in the International Settlement due
-to refugee influx. These terms ensure that the model can differentiate
-and estimate the unique effects of each event within each district type,
-thereby improving precision and interpretability.
+Interaction Terms:
+
+The interaction terms in the model are essential because they capture
+how the impact of historical events (e.g., the 1937 occupation of
+Chinese-administered districts, the 1940 refugee rejection in the French
+Concession, and the 1942 occupation of the International Settlement)
+varies across different district types. By including interactions
+between event indicators and district types, the model accounts for
+district-specific responses to each event, controlling for the fact that
+the effect of an event on population changes may not be uniform across
+all districts. For instance, the 1937 occupation might lead to
+population declines in Chinese-administered districts but population
+increases in the International Settlement due to refugee influx. These
+terms ensure that the model can differentiate and estimate the unique
+effects of each event within each district type, thereby improving
+precision and interpretability.
 
 \begin{itemize}
 \tightlist
 \item
-  \(\mbox{cd_occupied}_{i,t} \cdot \mbox{district_type}_{i, IS}\):
-  Captures the effect of the 1937 occupation on the International
-  Settlement in comparison to the Chinese-administered district (base
-  district).
+  \(\text{cd_occupied} \cdot \text{district_type}\): Captures the effect
+  of the 1937 occupation on the International Settlement in comparison
+  to the Chinese-administered district (base district).
 \item
-  \(\mbox{cd_occupied}_{i,t} \cdot \mbox{district_type}_{i, FC}\):
-  Captures the effect of the 1937 occupation on the French Concession in
-  comparison to the base district.
+  \(\text{cd_occupied} \cdot \text{district_type}\): Captures the effect
+  of the 1937 occupation on the French Concession in comparison to the
+  base district.
 \item
-  \(\mbox{french_surrender}_{i,t} \cdot \mbox{district_type}_{i, IS}\):
-  Effect of the 1940 refugee rejection on the International Settlement.
+  \(\text{french_surrender} \cdot \text{district_type}\): Effect of the
+  1940 refugee rejection on the International Settlement.
 \item
-  \(\mbox{french_surrender}_{i,t} \cdot \mbox{district_type}_{i, FC}\):
-  Effect of the 1940 refugee rejection on the French Concession.
+  \(\text{french_surrender} \cdot \text{district_type}\): Effect of the
+  1940 refugee rejection on the French Concession.
 \item
-  \(\mbox{is_occupied}_{i,t} \cdot \mbox{district_type}_{i, IS}\):
-  Effect of the 1942 occupation on the International Settlement.
+  \(\text{is_occupied} \cdot \text{district_type}\): Effect of the 1942
+  occupation on the International Settlement.
 \item
-  \(\mbox{is_occupied}_{i,t} \cdot \mbox{district_type}_{i, FC}\):
-  Effect of the 1942 occupation on the French Concession.
+  \(\text{is_occupied} \cdot \text{district_type}\): Effect of the 1942
+  occupation on the French Concession.
 \end{itemize}
 
 We run the model in R (R Core Team 2023) using the \texttt{rstanarm}
@@ -417,57 +459,118 @@ We can use maths by including latex between dollar signs, for instance
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
-Our results are summarized in Table~\ref{tbl-modelresults}.
+\begin{itemize}
+\tightlist
+\item
+  Data Trend Visualization
+\end{itemize}
 
-\hypertarget{tbl-modelresults}{}
-\begin{table}
-\caption{\label{tbl-modelresults}Explanatory models of flight time based on wing width and wing length }\tabularnewline
+\begin{figure}
 
-\centering
-\begin{tblr}[         %% tabularray outer open
-]                     %% tabularray outer close
-{                     %% tabularray inner open
-colspec={Q[]Q[]},
-column{1}={halign=l,},
-column{2}={halign=c,},
-hline{26}={1,2}{solid, 0.05em, black},
-}                     %% tabularray inner close
-\toprule
-& Population model \\ \midrule %% TinyTableHeader
-(Intercept)                                                  & \num{-0.05}      \\
-& (\num{15.64})    \\
-cd\_occupied                                                & \num{0.15}       \\
-& (\num{10.22})    \\
-district\_typeFrench Concession                             & \num{-0.11}      \\
-& (\num{9.98})     \\
-district\_typeInternational Settlement                      & \num{0.07}       \\
-& (\num{9.83})     \\
-french\_surrender                                           & \num{-0.06}      \\
-& (\num{10.22})    \\
-is\_occupied                                                & \num{-0.17}      \\
-& (\num{9.95})     \\
-cd\_occupied × district\_typeFrench Concession             & \num{-0.07}      \\
-& (\num{9.95})     \\
-cd\_occupied × district\_typeInternational Settlement      & \num{-0.06}      \\
-& (\num{9.81})     \\
-district\_typeFrench Concession × french\_surrender        & \num{0.01}       \\
-& (\num{9.96})     \\
-district\_typeInternational Settlement × french\_surrender & \num{-0.02}      \\
-& (\num{10.01})    \\
-district\_typeFrench Concession × is\_occupied             & \num{0.01}       \\
-& (\num{10.20})    \\
-district\_typeInternational Settlement × is\_occupied      & \num{0.00}       \\
-& (\num{9.85})     \\
-Num.Obs.                                                     & \num{21}         \\
-R2                                                           & \num{0.000}      \\
-Log.Lik.                                                     & \num{-325.376}   \\
-RMSE                                                         & \num{1293540.34} \\
-\bottomrule
-\end{tblr}
-\end{table}
+{\centering \includegraphics{paper_files/figure-pdf/fig-pop-1.pdf}
+
+}
+
+\caption{\label{fig-pop}Population in Shanghai between 1936 - 1942}
+
+\end{figure}
+
+\begin{itemize}
+\tightlist
+\item
+  Model results are summarized in Table~\ref{tbl-modelresults} in
+  Appendix (Section~\ref{sec-model-details}).
+\end{itemize}
+
+\hypertarget{district-impact-on-population}{%
+\paragraph{District Impact on
+Population}\label{district-impact-on-population}}
+
+\hypertarget{tbl-district}{}
+\begin{longtable}[]{@{}ccc@{}}
+\caption{\label{tbl-district}Explanatory models of flight time based on
+wing width and wing length}\tabularnewline
+\toprule\noalign{}
+Parameters & Estimated Effect & Standard Error \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Parameters & Estimated Effect & Standard Error \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+(Intercept) & 117928165.6 & 189545438.8 \\
+district\_is & -943281.6 & 381299.4 \\
+district\_fc & -1642126.9 & 350808.4 \\
+\end{longtable}
+
+\hypertarget{historical-events}{%
+\paragraph{Historical Events}\label{historical-events}}
+
+\hypertarget{tbl-events}{}
+\begin{longtable}[]{@{}ccc@{}}
+\caption{\label{tbl-events}Explanatory models of flight time based on
+wing width and wing length}\tabularnewline
+\toprule\noalign{}
+Parameters & Estimated Effect & Standard Error \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Parameters & Estimated Effect & Standard Error \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+cd\_occupied & 89350.01 & 350665.6 \\
+french\_surrender & -735223.28 & 340852.1 \\
+is\_occupied & -88982.32 & 361506.9 \\
+\end{longtable}
+
+\hypertarget{historic-events-impact-on-each-district}{%
+\paragraph{Historic Events' Impact on Each
+District}\label{historic-events-impact-on-each-district}}
+
+\begin{verbatim}
+# A tibble: 6 x 3
+  term                         estimate std.error
+  <chr>                           <dbl>     <dbl>
+1 is_occupied                   -88982.   361507.
+2 district_is:cd_occupied        89431.   414727.
+3 district_fc:cd_occupied        38397.   410271.
+4 district_is:french_surrender  470618.   352216.
+5 district_fc:french_surrender 1044471.   352470.
+6 district_is:is_occupied       934059.   476934.
+\end{verbatim}
+
+\hypertarget{tbl-events_district}{}
+\begin{longtable}[]{@{}ccc@{}}
+\caption{\label{tbl-events_district}Explanatory models of flight time
+based on wing width and wing length}\tabularnewline
+\toprule\noalign{}
+Parameters & Estimated Effect & Standard Error \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Parameters & Estimated Effect & Standard Error \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+is\_occupied & -88982.32 & 361506.9 \\
+district\_is:cd\_occupied & 89430.69 & 414726.8 \\
+district\_fc:cd\_occupied & 38396.87 & 410271.2 \\
+district\_is:french\_surrender & 470617.65 & 352215.9 \\
+district\_fc:french\_surrender & 1044470.54 & 352469.9 \\
+district\_is:is\_occupied & 934059.10 & 476934.2 \\
+\end{longtable}
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
+
+\hypertarget{interpretation-of-the-event-impacts}{%
+\subsection{Interpretation of the Event
+Impacts}\label{interpretation-of-the-event-impacts}}
 
 \hypertarget{reason-why-the-french-concession-was-exempted-from-japanese-occupation}{%
 \subsection{Reason why the French Concession was Exempted from Japanese
@@ -593,6 +696,58 @@ Weaknesses}\label{data-measurement-weaknesses}}
 
 \hypertarget{sec-model-details}{%
 \section{Model details}\label{sec-model-details}}
+
+\hypertarget{model-summary-table}{%
+\subsection{Model Summary Table}\label{model-summary-table}}
+
+\hypertarget{tbl-modelresults}{}
+\begin{table}
+\caption{\label{tbl-modelresults}Explanatory models of flight time based on wing width and wing length }\tabularnewline
+
+\centering
+\begin{tblr}[         %% tabularray outer open
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+hline{28}={1,2}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& Population model \\ \midrule %% TinyTableHeader
+(Intercept)                        & \num{117928165.58}   \\
+& (\num{189545438.85}) \\
+year                               & \num{-59841.02}      \\
+& (\num{98298.59})     \\
+district\_is                      & \num{-943281.63}     \\
+& (\num{381299.41})    \\
+district\_fc                      & \num{-1642126.91}    \\
+& (\num{350808.44})    \\
+cd\_occupied                      & \num{89350.01}       \\
+& (\num{350665.57})    \\
+french\_surrender                 & \num{-735223.28}     \\
+& (\num{340852.10})    \\
+is\_occupied                      & \num{-88982.32}      \\
+& (\num{361506.88})    \\
+district\_is × cd\_occupied      & \num{89430.69}       \\
+& (\num{414726.84})    \\
+district\_fc × cd\_occupied      & \num{38396.87}       \\
+& (\num{410271.18})    \\
+district\_is × french\_surrender & \num{470617.65}      \\
+& (\num{352215.89})    \\
+district\_fc × french\_surrender & \num{1044470.54}     \\
+& (\num{352469.86})    \\
+district\_is × is\_occupied      & \num{934059.10}      \\
+& (\num{476934.16})    \\
+district\_fc × is\_occupied      & \num{377436.02}      \\
+& (\num{466616.20})    \\
+Num.Obs.                           & \num{21}             \\
+R2                                 & \num{0.837}          \\
+Log.Lik.                           & \num{-289.106}       \\
+RMSE                               & \num{162825.22}      \\
+\bottomrule
+\end{tblr}
+\end{table}
 
 \hypertarget{posterior-predictive-check}{%
 \subsection{Posterior predictive

@@ -9,13 +9,15 @@
 
 
 #### Workspace setup ####
+library(tidyverse)
+library(testthat)
+library(arrow)
+
+
 model_format <- read_parquet("data/02-analysis_data/model_format.parquet")
 year_refugee_summary <- read_parquet("data/02-analysis_data/year_refugee_summary.parquet")
 calibration_percent <- read_parquet("data/02-analysis_data/calibration_percent.parquet")
 
-library(tidyverse)
-library(testthat)
-library(arrow)
 
 #### Test data ####
 
