@@ -27,7 +27,6 @@ The entire chat history is available in inputs/llms/usage.txt.
 
 ## Checklist
 
-1.  Datasheet
 3.  Introduction
 4.  Cross-References
 5.  Add visualizations; check visualization captions

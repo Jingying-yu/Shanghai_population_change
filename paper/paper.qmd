@@ -9,6 +9,7 @@ date-format: long
 abstract: "This paper evaluates the impact of three historic events on the population dynamics of Shanghai during WWII: the Japanese occupation of the Chinese-administered area, France’s surrender in WWII, and the Japanese occupation of the International Settlement. Data from the Virtual Shanghai research platform and historic publications are analyzed using a difference-in-difference model to estimate the effects of these events. The results indicate that the Japanese occupation of the Chinese-administered area led to an overall increase in Shanghai’s population across all districts. In contrast, France’s surrender during WWII had a negative impact on population numbers in all districts except the French Concession. Similarly, the Japanese occupation of the International Settlement caused population declines in all districts except the International Settlement itself. These findings underscore the complex demographic shifts resulting from geopolitical events and reveal how wartime occupation reshaped urban populations in uneven ways, reflecting resilience and displacement patterns."
 format: pdf
 number-sections: true
+toc: true
 bibliography: references.bib
 ---
 
@@ -42,7 +43,6 @@ did_model <- readRDS(file = here::here("models/did_model.rds"))
 
 # Introduction
 
-
 Overview paragraph
 
 Estimand paragraph
@@ -61,7 +61,6 @@ Data is cleaned and analyzed using the open-source statistical programming langu
 
 The primary dataset is sourced from the appendix of the research publication 《旧上海人口变迁的研究》 (@sh), which includes selected excerpts from historical government census records. Due to the age of the original census documents, they are no longer available online. To address gaps in the primary dataset, complementary data was obtained from the research platform Virtual Shanghai (@virtualshanghai), providing crucial insights to fill missing areas.
 
-
 ## Historical Background
 
 Between 1936 and 1942, China was in a state of political and social upheaval, marked by increasing Japanese aggression and internal instability. Shanghai, a critical urban center, was divided into three districts: the Chinese-administered district, the International Settlement (primarily governed by the U.K. and U.S.), and the French Concession (under French governance). The International Settlement and French Concession operated with significant autonomy compared to the Chinese government’s limited authority over its district. Each district occupied distinct proportions of Shanghai’s urban landscape.
@@ -72,18 +71,17 @@ Between 1936 and 1942, China was in a state of political and social upheaval, ma
 
 2\. 1937-11-12: Japanese armed forces claims occupation of Shanghai --\> ends Chinese district
 
-1940-06-22: France surrendered to Germany --\> French Concession stopped taking refugees
+3\. 1940-06-22: France surrendered to Germany --\> French Concession stopped taking refugees
 
-3\. 1942-01: Japanese armed forces claims authority over International Settlement (which was mainly under the governance of U.K and U.S prior to this date)
+4\. 1942-01: Japanese armed forces claims authority over International Settlement (which was mainly under the governance of U.K and U.S prior to this date)
 
-4\. 1945-08-15: Japan surrendered in WWII
+5\. 1945-08-15: Japan surrendered in WWII
 
-5\. 1945-10: most Japanese armed forces withdrew from Shanghai
-
+6\. 1945-10: most Japanese armed forces withdrew from Shanghai
 
 ## Measurement & Methodology
 
-The majority of the data used in this analysis were collected by police officers or hired local authorities within each district of Shanghai, as detailed in the source (@sh, page 2). 
+The majority of the data used in this analysis were collected by police officers or hired local authorities within each district of Shanghai, as detailed in the source (@sh, page 2).
 
 This paper focuses on population data from 1936 to 1942, a timeframe determined by both historical relevance and data availability. The analysis centers on the impact of three major historical events, beginning with the Japanese occupation of the Chinese-administered district on November 12, 1937. Given that Japanese forces first entered Shanghai on August 13, 1937, the year 1936 is chosen as the baseline or “no-treatment” year for comparison. The analysis concludes with the year 1942, as district-specific population data after this year is unavailable. The lack of records for the period between 1943 and 1949 coincides with the political transition to the People’s Republic of China, making 1942 the final year for which reliable district-based population data exists.
 
@@ -101,10 +99,8 @@ The survey process faced several challenges, primarily due to population volatil
 
 knitr::kable(combined_data, col.names = c("Year", "Pop CHN District", "Pop IS", "Pop FC"), align = c("c", "c", "c", "c"))
 ```
-This paper primarily evaluates three historic events between 1936 - 1942:
-1. The Japanese occupation of Shanghai's Chinese-administrated District -- 1937-11-12
-2. France surrendered to Germany -- 1940-06-22
-3. Japanese armed forces claims authority over International Settlement -- 1942-01
+
+This paper primarily evaluates three historic events between 1936 - 1942: 1. The Japanese occupation of Shanghai's Chinese-administrated District -- 1937-11-12 2. France surrendered to Germany -- 1940-06-22 3. Japanese armed forces claims authority over International Settlement -- 1942-01
 
 The first and third events should have very straight-forward consequences on population. The shifting over governing power to a foreign, hostile country would intuitive cause local population to panick and evacuate. In this paper, we initially assumed that Japanese occupation would decrease population in the corresponding area.
 
@@ -117,7 +113,6 @@ The outcome variable in this analysis is the *population* from 1936 to 1942.
 District-level population data is missing for the years 1938, 1939, 1940 (partially), and 1941 in the government records. For 1938, 1939, and 1940, the population counts for all districts are unavailable due to undocumented reasons. To estimate these values, the population for the International Settlement and French Concession is deduced by adding the refugee population in their camps to their respective 1937 population counts. The population of the Chinese-administered district is then estimated by subtracting the total number of refugees in the two foreign districts from its 1937 population.
 
 The missing population data for 1941 is estimated by calibrating the pre-established 1942 population dataset (@population1941) against the primary data. A multiplier is derived to adjust the 1941 data to align as closely as possible with the available records, providing an approximate but consistent estimation.
-
 
 ```{r}
 #| echo: false
@@ -167,7 +162,7 @@ knitr::kable(sliced_table, col.names = c("Year", "Population", "district_is", "d
 
 ```
 
-# Model
+# Model {#sec-model}
 
 The goal of our modelling strategy is to evaluate the impact of 2 historical events in Shanghai during WWII.
 
@@ -179,8 +174,7 @@ Background details and diagnostics are included in Appendix [@sec-model-details]
 
 $$y_i|\mu_i, \sigma \sim \text{Normal}(\mu_{i,t}, \sigma)$$
 
-$$\mu_i = \alpha + \beta_k$$
-$$\alpha \sim \text{Normal}(0, 2.5)$$
+$$\mu_i = \alpha + \beta_k$$ $$\alpha \sim \text{Normal}(0, 2.5)$$
 
 $$\beta_k \sim \text{Normal}(0, 2.5) \quad \text{for } k = 1, ..., 12$$
 
@@ -198,7 +192,6 @@ $$\sigma \sim \text{Exponential}(1)$$
 -   $\beta_6$: the coefficient for the indicator *is_occupied*. This indicator marks the Japanese occupation of the International Settlement in 1942 (1 if $t \geq 1942$, 0 otherwise). The coefficient measures the effect of this indicator on population of Shanghai within a given year.
 -   $\beta_i\ where\ i = 7, ..., 12$: coefficients for interaction terms below. Each term ajusts the impact of a historical events on a district-specific basis.
 
-
 **Interaction Terms**:
 
 -   *district_is × cd_occupied*: Captures the effect of the 1937 occupation on the International Settlement in comparison to the Chinese-administered district (base district).
@@ -211,24 +204,20 @@ $$\sigma \sim \text{Exponential}(1)$$
 We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
 
 ### Model justification
-The Difference-in-Difference model is chosen to evaluate the impact of historical events by comparing the observed outcomes, population changes, to an imaginary counterfactual scenario where these events did not occur.
-The year variable captures the temporal trends, allowing the model to account for changes in population over time. The district variable identifies the three distinct regions in Shanghai (Chinese-administered district, International Settlement, and French Concession), each subject to unique governance and historical impacts. These inclusions enable the model to control for factors beyond the primary variables of interest (historical events).
+
+The Difference-in-Difference model is chosen to evaluate the impact of historical events by comparing the observed outcomes, population changes, to an imaginary counterfactual scenario where these events did not occur. The year variable captures the temporal trends, allowing the model to account for changes in population over time. The district variable identifies the three distinct regions in Shanghai (Chinese-administered district, International Settlement, and French Concession), each subject to unique governance and historical impacts. These inclusions enable the model to control for factors beyond the primary variables of interest (historical events).
 
 The interaction terms in the model are essential because they capture how the impact of historical events (e.g., the 1937 occupation of Chinese-administered districts, the 1940 refugee rejection in the French Concession, and the 1942 occupation of the International Settlement) varies across different district types. By including interactions between event indicators and district types, the model accounts for district-specific responses to each event, controlling for the fact that the effect of an event on population changes may not be uniform across all districts. For instance, the 1937 occupation might lead to population declines in Chinese-administered districts but population increases in the International Settlement due to refugee influx. These terms ensure that the model can differentiate and estimate the unique effects of each event within each district type, thereby improving precision and interpretability.
 
-A negative relationship is expected between year and population because the period under study (1936–1942) was marked by military conflict and foreign occupation, creating an unstable living environment. Specifically:
-- Chinese-administered District: A population decline is expected due to the Japanese occupation in 1937.
-- French Concession: A population decrease is anticipated following France’s surrender in 1940, which led to refugee rejection.
-- International Settlement: A population decline is expected after its occupation by Japanese forces in 1942.
+A negative relationship is expected between year and population because the period under study (1936–1942) was marked by military conflict and foreign occupation, creating an unstable living environment. Specifically: - Chinese-administered District: A population decline is expected due to the Japanese occupation in 1937. - French Concession: A population decrease is anticipated following France’s surrender in 1940, which led to refugee rejection. - International Settlement: A population decline is expected after its occupation by Japanese forces in 1942.
 
+# Results {#sec-results}
 
-
-
-# Results
 This section presents the population trends in Shanghai’s districts between 1936 and 1942, the estimated effects of district type and key historical events on population, and the district-specific impacts of these events as captured by interaction terms. The analysis highlights distinct population shifts driven by both district characteristics and the varying effects of war-related events.
 
 ## Population Trend
-```{r}
+
+```{r, fig.pos="H"}
 #| label: fig-pop
 #| fig-cap: Population in Shanghai between 1936 - 1942
 #| echo: false
@@ -252,13 +241,14 @@ ggplot(model_format, aes(x = year, y = population, fill = district_type, color =
   theme_minimal() +
   theme(
     legend.position = "bottom",
-    text = element_text(size = 12),
+    text = element_text(size = 10),
     plot.title = element_text(hjust = 0.5)
   )
 ```
+
 The population trends from 1936 to 1942 reveal distinct shifts across the three districts in Shanghai: the Chinese-administered area, the French Concession, and the International Settlement. In the Chinese-administered area, the population remained stable until 1937, after which a decline began in 1940, continuing through 1942. The International Settlement experienced consistent population growth throughout the period, with the largest increases occurring after 1938. The French Concession maintained population stability until 1940, followed by a slight increase in 1941, which plateaued in 1942.
 
-## Model results 
+## Model results
 
 Model results are summarized in @tbl-modelresults in Appendix (@sec-model-details).
 
@@ -292,6 +282,7 @@ d_types <- model_summary |>
 
 knitr::kable(d_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c", "c"))
 ```
+
 Model estimates highlight the influence of district type on population. The baseline population, Chinese-administrated district population, is represented by the intercept, is estimated at 11,792,816.58, with a standard error of 18,954,543.85. This estimate is not a realistic estimate since the year variable is not included. This intercept is population at year = 0, which does not actually exist. Temporal impact on population is estimated using the *year* variable, observing a decline of 59,841.02 across all districts, with a standard error of 98,298.59. The International Settlement exhibits a population difference of -943,281.63 (standard error: 381,299.41) compared to the Chinese-administered area, while the French Concession shows a difference of -1,642,126.91 (standard error: 350,808.44).
 
 ### Historical Events
@@ -313,75 +304,133 @@ event_types <- model_summary |>
 
 knitr::kable(event_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c"))
 ```
+
 The effects of three historical events on population are also quantified. The Japanese occupation of the Chinese-administered area in 1937 (cd_occupied) is associated with an increase of 89,350.01 (standard error: 350,665.57). France’s surrender in 1940 (french_surrender) results in a population decrease of 735,223.28 (standard error: 340,852.1). The Japanese occupation of the International Settlement in 1942 (is_occupied) corresponds to a population decrease of 88,982.32 (standard error: 361,506.9).
 
 ### Historic Events' Impact on Each District
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-events_district
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
 
-# Filter for the specific coefficient you want (e.g., "cd_occupied")
-impact_types <- model_summary[8:12, ] |>
-  mutate(estimate = round(estimate, 2),
-    std.error = round(std.error, 2))
-
-knitr::kable(impact_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c", "c", "c", "c"))
-```
 The interaction terms, which capture district-specific responses to historical events, provide additional insight. The Japanese occupation of the Chinese-administered area increases the population in the International Settlement by 89,430.69 (standard error: 414,726.8) and in the French Concession by 38,396.87 (standard error: 410,271.2). France’s surrender increases the population in the International Settlement by 470,617.65 (standard error: 352,215.9) and in the French Concession by 1,044,470.54 (standard error: 352,469.9). The Japanese occupation of the International Settlement itself is associated with an increase of 934,059.1 (standard error: 476,934.2) in the International Settlement’s population. Interaction terms differ from main effects by isolating the impact of historical events within each district type, providing a detailed analysis of population dynamics during this period.
 
+```{r, fig.pos="H"}
+#| label: fig-cd_occupied
+#| fig-cap: Trend of Population after Chinese-administrated District became occupied in 1937
+#| echo: false
+#| warning: false
+#| message: false
 
-# Discussion
+ggplot(model_format, aes(x = year, y = population, fill = district_type)) +
+  geom_bar(stat = "identity") +  # Bar plot
+  facet_wrap(~ district_type, strip.position = "bottom") +  # Facet by district_type
+  geom_vline(xintercept = 1937, linetype = "dashed", color = "red") +  # Vertical dashed line
+  geom_label(
+    aes(
+      x = 1939, y = 2500000,  # Adjust text position above 2,500,000
+      label = "Starting from 1937,\nCHN District is occupied ---->"
+    ),
+    inherit.aes = FALSE,  # Prevent inheritance from aes()
+    fill = "pink", color = "red", alpha = 0.3, size = 2.5, label.size = 0
+  ) +
+  # Add trend line for years >= 1937
+  geom_smooth(
+    data = model_format[model_format$year >= 1937, ],  # Filter data for years >= 1937
+    aes(group = district_type),
+    alpha = 0.8,
+    method = "lm",  # Linear regression
+    linetype = "dotted",
+    color = "black", size = 1, se = FALSE  # Black trend line, no standard error
+  ) +
+  scale_y_continuous(limits = c(0, 2800000)) +  # Set y-axis limit to 2,800,000
+  labs(
+    title = "Population Trends after Occupation of CHN District",
+    x = "Year",
+    y = "Population",
+    fill = "Year"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "bottom"
+  )
+```
 
-## Interpretation of the Event Impacts
-The results indicate that the Japanese occupation of the Chinese-administered area led to an overall increase in Shanghai’s population across all districts. In contrast, France’s surrender during WWII had a negative impact on population numbers in all districts except the French Concession. Similarly, the Japanese occupation of the International Settlement caused population declines in all districts except the International Settlement itself.
+```{r, fig.pos="H"}
+#| label: fig-fr_surrender
+#| fig-cap: Visualization of Population trend after French surrender in 1940
+#| echo: false
+#| warning: false
+#| message: false
 
-### Impact of Occupation in Chinese District
-- By intuition, we would think that the foreign-force occupation of a district would lead to its population to fled to other areas. However, this does not seem the case for the Chinese-administrated District within Shanghai.
-- This counter-intuitive phenomenon might be caused by several factors. 
-Firstly, the increase in the districts population might be cause by an influx of foreign state refugees. Shanghai was, and still is, one of the largest economic center in China and has an abundance of non-land-dependent job opportunity. 战争时期，随时随地可能发生的战事极大的interrupted agriculture, subsequently leading to a large volume of unemployed farmers. These unemployed population will likely flood to economic centers and industrial center in search of a new job. (@sh, page 14)
+ggplot(model_format, aes(x = year, y = population, fill = district_type)) +
+  geom_bar(stat = "identity") +  # Bar plot
+  facet_wrap(~ district_type, strip.position = "bottom") +  # Facet by district_type
+  geom_vline(xintercept = 1940, linetype = "dashed", color = "red") +  # Vertical dashed line
+  geom_label(
+    aes(
+      x = 1939, y = 2500000,  # Adjust text position above 2,500,000
+      label = "Starting from 1940, \nFrance surrendered to Germany -->"
+    ),
+    inherit.aes = FALSE,  # Prevent inheritance from aes()
+    fill = "lightgreen", color = "black", alpha = 0.3, size = 2, label.size = 0
+  ) +
+  # Add trend line for years >= 1937
+  geom_smooth(
+    data = model_format[model_format$year >= 1940, ],  # Filter data for years >= 1937
+    aes(group = district_type),
+    alpha = 0.8,
+    method = "lm",  # Linear regression
+    linetype = "dotted",
+    color = "black", size = 1, se = FALSE  # Black trend line, no standard error
+  ) +
+  scale_y_continuous(limits = c(0, 2800000)) +  # Set y-axis limit to 2,800,000
+  labs(
+    title = "Population Trend After French Surrender",
+    x = "Year",
+    y = "Population",
+    fill = "Year"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "bottom"
+  )
+```
 
-### Impact of French Surrendering to Germany on Shanghai
 
-### Impact of Occupation in International Settlement
+# Discussion {#sec-discussion}
 
-## Reason why the French Concession was Exempted from Japanese Occupation
+The results highlight the varying population shifts in Shanghai’s three districts during key historical events in WWII. The Japanese occupation of the Chinese-administered district led to an overall increase in Shanghai’s population across all districts. In contrast, France’s surrender during WWII negatively impacted population numbers in all districts except the French Concession. Similarly, the Japanese occupation of the International Settlement caused population declines in all districts except the International Settlement itself.
 
--   During WWII, on the European battlefield, France surrendered to Germany on June 22nd of 1940 (Check this & reference with a credible source). Since Japan was on the same side as Germany during that time, Japanese armed forces decided allow the French Concession to retain its own governance.
--   However, the French Concession is still constantly under the watch of the Japanese forces that has occupied the rest of Shanghai since 1942. 街上不得有侮辱日本的旗帜或者宣言，官方必须积极配合日本统治者进行有利于日本统治的宣传,etc.(can reference to video summary here)
+## Occupation in Chinese District
 
-## Refugees from outside of Shanghai Province
+Contrary to expectations, the Japanese occupation of the Chinese-administered district did not result in population declines. Instead, this district experienced an increase in population, likely driven by refugees fleeing rural provinces. The devastation of agricultural economies due to ongoing warfare forced farmers to seek alternative livelihoods in urban centers. Shanghai, being an economic hub with abundant industrial job opportunities, became a natural destination for displaced populations (@sh, page 14).
 
--   industrialization was not so popular back in the 1930s, many provinces are still mostly rural. But warfare messed with the land and the yields, causing many farmers to starve and ultimately have to seek refugee (find job) in industrialized city (where income is not dependent on land yield)
--   many people flooded to Shanghai for this reason (can insert calculation in data table 20 from reference book here)
+Industrialization during the 1930s and 1940s was concentrated in cities like Shanghai, while most provinces remained predominantly rural. Disrupted farming activities caused widespread unemployment, prompting many to migrate to Shanghai, where income was not tied to land productivity. The high population density in Shanghai further fueled its economic growth, offering a range of job opportunities, especially in manufacturing industries located in the foreign settlements.
 
-### Job Oppurtunities in Shanghai
+However, access to jobs was not uniform. Historical records suggest that certain industries were dominated by migrants from specific provinces due to the strong influence of regional associations. For example, hotel businesses were often monopolized by individuals from Hunan, while the footbath service industry was controlled by migrants from Northern Jiangsu. This social network-based hiring created barriers to entry for outsiders, shaping the employment landscape in Shanghai.
 
-Aside from the instability caused by the Japanese armed forces, there are a few other reasons for Chinese population to move into the international settlement & French Concession. 1. Job opportunities - Heart of Shanghai city in the 1930-1940s, high pop density lead to boom of economy = more job opportunities - many factories are located with the settlements (less so in concession)
 
-### Barrier to Entry in Job Market
+## French Surrendering to Germany on Shanghai Population
 
-2.  Barrier to Entry for certain job types
+The French Concession displayed unique population dynamics during WWII. Following France’s surrender to Germany on June 22, 1940, the concession ceased accepting refugees. This sudden shift in refugee policy aligns with geopolitical developments, as France temporarily allied with Germany during this period. The Japanese armed forces allowed the French Concession to maintain governance autonomy, likely due to this alliance.
 
--   旧时候 -- 通讯还没有那么发达的时候，人们都很团结。那个时候同乡会的力量很强大。在外省，从同一个省来的漂泊者会互相帮扶着垄断一个城市的某种行业。例如，在旧上海，要做酒店生意的话你就必须是湖南人，给人做洗脚生意的肯定是苏北人。。。
+Despite retaining governance, the French Concession operated under the watchful eye of Japanese forces, who occupied the rest of Shanghai by 1942. Compliance with Japanese regulations, including bans on anti-Japanese propaganda, was mandatory. The political alignment with Germany thus shielded the French Concession from direct occupation but altered its role as a haven for refugees.
+
+
+## Occupation in International Settlement
+The Japanese occupation of the International Settlement resulted in a population pattern contrary to initial expectations. While occupation typically drives residents away, the settlement remained one of the safest and most expensive areas in Shanghai. With the French Concession no longer accepting refugees, the International Settlement became the primary refuge for displaced individuals, stabilizing its population despite foreign control. Its status as an elite residential district further insulated it from severe population declines.
+
+
 
 ## Instability after Japanese Occupation ends in WWII: Chinese Civil War
 
--   after the Japanese armed forces withdrawed from Shanghai, what follows is not recovery and rest for the local population
--   Competition for power within China's 2 political parties caused full-scale political warfare, now known as the *Chinese Civil War*
--   unlike Western political parties, Chinese political parties in the 1900s are more like parties of a throne. They each have their own ideology and an armed forces that follow. Most of all of the provinces are effected by this internal warfare, which ended in 1949 as 国民党 lost and withdrawed to Taiwan.
+The end of Japanese occupation in 1945 did not bring stability to Shanghai. Instead, the city became embroiled in the Chinese Civil War, as the two dominant political parties—Kuomintang and the Chinese Communist Party—vied for control. Unlike Western political parties, these factions operated as militarized entities with distinct ideologies and armed forces. The civil war, which engulfed much of China, ended in 1949 with the Kuomintang retreating to Taiwan, leaving behind a landscape marked by prolonged instability.
 
 ## Weaknesses and next steps
 
-### Data Measurement Weaknesses
+The study acknowledges several limitations. First, data recorded during wartime is incomplete, with many population figures missing. Additionally, population counts were based on households, with the number of individuals per household estimated from historical averages. This approach may not accurately capture the actual population. Furthermore, under-reporting or partial reporting for economic or convenience reasons may have compromised data accuracy.
 
--   data was recorded during wartime, many numbers were missing
--   base unit for population records is not ppl, it is instead "household". \# of ppl in a household is estimated based on historical data
--   many people chose to not report or partially report numbers due to convience or economic reasons, data may not be accurate
+Future research should focus on improving data reconstruction methods, incorporating archival records, and leveraging advanced modeling techniques to address these limitations. Expanding the analysis to include other affected regions in China could also provide a broader understanding of the population dynamics during WWII.
 
-### Next Steps
 
 \newpage
 
@@ -390,36 +439,15 @@ Aside from the instability caused by the Japanese armed forces, there are a few 
 # Appendix {.unnumbered}
 
 # Model details {#sec-model-details}
-## Model Summary Table
-
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Complete Model Summary for DiD model used in analysis"
-#| warning: false
-
-modelsummary::modelsummary(
-  list(
-    "Population model" = did_model
-  ),
-  statistic = "mad",
-  fmt = 2,
-  metrics = c("R2", "RMSE")
-)
-```
-\newpage
 
 
 ## Posterior predictive check
 
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. 
-The posterior predictive check evaluates how well the model-generated predictions ($y_{rep}$) match the observed data ($y$). The overlay of the predictive distribution with the observed data indicates that the model captures the general trends and variability in the data. The similarity between the observed data and the model’s predictions suggests that the model provides a good fit for the observed population data.
+In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. The posterior predictive check evaluates how well the model-generated predictions ($y_{rep}$) match the observed data ($y$). The overlay of the predictive distribution with the observed data indicates that the model captures the general trends and variability in the data. The similarity between the observed data and the model’s predictions suggests that the model provides a good fit for the observed population data.
 
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. 
-The comparison between the posterior and prior distributions shows how the data influences the model parameters. The posterior distributions are narrower and more distinct compared to the priors, indicating that the data strongly informed the parameter estimates. Parameters like $cd\_occupied$ and $district\_fc$ show clear shifts in their posterior means, signifying their significant role in explaining population changes. Conversely, parameters with less distinct posteriors might indicate weaker evidence from the data.
+In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. The comparison between the posterior and prior distributions shows how the data influences the model parameters. The posterior distributions are narrower and more distinct compared to the priors, indicating that the data strongly informed the parameter estimates. Parameters like $cd\_occupied$ and $district\_fc$ show clear shifts in their posterior means, signifying their significant role in explaining population changes. Conversely, parameters with less distinct posteriors might indicate weaker evidence from the data.
 
-```{r}
+```{r, fig.pos="H"}
 #| eval: true
 #| echo: false
 #| message: false
@@ -447,10 +475,9 @@ posterior_vs_prior(did_model) +
 
 @fig-stanareyouokay-1 is a trace plot. The trace plot displays the MCMC sampling for each parameter across the chains. The chains appear to mix well, with no clear trends or patterns, indicating that the algorithm explores the parameter space efficiently. This suggests good convergence, as the chains reach their stationary distribution without being stuck in local modes.
 
-
 @fig-stanareyouokay-2 is a Rhat plot. The Rhat plot evaluates the convergence of the chains by comparing the within-chain and between-chain variance. All Rhat values are close to 1.0, indicating that the chains have converged. This suggests that the parameter estimates are reliable, and the sampling process provides consistent results across chains.
 
-```{r}
+```{r, fig.pos="H"}
 #| echo: false
 #| eval: true
 #| message: false
@@ -466,11 +493,29 @@ plot(did_model, "rhat")
 ```
 
 
+## Model Summary
+```{r, fig.pos="H"}
+#| echo: false
+#| eval: true
+#| label: tbl-modelresults
+#| tbl-cap: "Complete Model Summary for DiD model used in analysis"
+#| warning: false
+
+modelsummary::modelsummary(
+  list(
+    "Population model" = did_model
+  ),
+  statistic = "mad",
+  fmt = 2,
+  metrics = c("R2", "RMSE")
+)
+
+```
 \newpage
 
 # Idealized Survey Methodology
 
-This appendix presents an idealized design for a population sampling survey, assuming that a data-recorder has unlimited time and authority to collect data within the historical timeframe of 1936–1942. The proposed methodology outlines a systematic approach to gathering detailed population data from Shanghai’s districts during pivotal wartime events, with considerations for the practical constraints and technology available during that period. While acknowledging the inherent challenges of conducting such a survey, this design aims to provide a comprehensive framework for understanding population dynamics within the Chinese-administered areas, International Settlement, and French Concession.
+This appendix presents an idealized design for a population sampling survey, assuming that a data-recorder has unlimited time and authority to collect data within the historical time-frame of 1936–1942. The proposed methodology outlines a systematic approach to gathering detailed population data from Shanghai’s districts during pivotal wartime events, with considerations for the practical constraints and technology available during that period. While acknowledging the inherent challenges of conducting such a survey, this design aims to provide a comprehensive framework for understanding population dynamics within the Chinese-administered areas, International Settlement, and French Concession.
 
 ## Objective of the Survey
 
