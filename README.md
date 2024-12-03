@@ -8,20 +8,30 @@ Primary dataset is pulled from this [publication](https://github.com/Jingying-yu
 
 Other re-established datasets can be found on the [Virtual Shanghai Research Platform](https://www.virtualshanghai.net).
 
-
-
 ## File Structure
 
 The repo is structured as:
 
 -   `data/01-raw_data` contains the raw data as obtained from X.
 -   `data/02-analysis_data` contains the cleaned dataset that was constructed.
--   `model` contains fitted models. 
+-   `model` contains fitted models.
 -   `other` contains relevant literature, details about LLM chat interactions, and sketches.
--   `paper` contains the files used to generate the paper, including the Quarto document and reference bibliography file, as well as the PDF of the paper. 
+-   `paper` contains the files used to generate the paper, including the Quarto document and reference bibliography file, as well as the PDF of the paper.
 -   `scripts` contains the R scripts used to simulate, download and clean data.
-
 
 ## Statement on LLM usage
 
-Aspects of the paper content and code were written with the help of the large language model, ChatGPT 4o. The entire chat history is available in inputs/llms/usage.txt.
+Aspects of the paper content and code were written with the help of the large language model, ChatGPT 4o.
+
+The entire chat history is available in inputs/llms/usage.txt.
+
+## Checklist
+
+1.  Datasheet
+2.  Upload Sketchs
+3.  Introduction
+4.  Data Methodology
+5.  Model Justification
+6.  Results
+7.  Discussion Refine
+8.  Appendix Model Testing

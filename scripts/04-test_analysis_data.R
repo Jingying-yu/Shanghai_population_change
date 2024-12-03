@@ -1,11 +1,11 @@
 #### Preamble ####
-# Purpose: Tests... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 26 September 2024 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Tests the cleaned data to ensure data cleaning procedure is done correctly
+# Author: Sandy Yu
+# Date: 16 November 2024
+# Contact: jingying.yu@mail.utoronto.ca]
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: cleaned raw data and saved to correct folder
+
 
 
 #### Workspace setup ####
