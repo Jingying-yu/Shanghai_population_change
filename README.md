@@ -2,9 +2,12 @@
 
 ## Overview
 
-overview of topic:
+Wars reshape cities in unexpected ways. This paper explores how three major WWII events—Japanese occupation of the Chinese-administered area, France’s surrender, and Japanese control of the International Settlement—reshaped Shanghai’s population dynamics.
 
-source of data:
+Primary dataset is pulled from this [publication](https://github.com/Jingying-yu/Shanghai_population_change/blob/main/other/literature/旧上海人口变迁研究.pdf).
+
+Other re-established datasets can be found on the [Virtual Shanghai Research Platform](https://www.virtualshanghai.net).
+
 
 
 ## File Structure
