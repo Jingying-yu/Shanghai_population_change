@@ -28,10 +28,9 @@ The entire chat history is available in inputs/llms/usage.txt.
 ## Checklist
 
 1.  Datasheet
-2.  Upload Sketchs
+2.  Upload Sketches
 3.  Introduction
 4.  Data Methodology
 5.  Model Justification
-6.  Results
-7.  Discussion Refine
-8.  Appendix Model Testing
+6.  Discussion Refine
+7.  Appendix Model Testing

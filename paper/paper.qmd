@@ -199,8 +199,9 @@ We can use maths by including latex between dollar signs, for instance $\theta$.
 
 
 # Results
+This section presents the population trends in Shanghai’s districts between 1936 and 1942, the estimated effects of district type and key historical events on population, and the district-specific impacts of these events as captured by interaction terms. The analysis highlights distinct population shifts driven by both district characteristics and the varying effects of war-related events.
 
--   Data Trend Visualization
+## Population Trend
 
 ```{r}
 #| label: fig-pop
@@ -230,8 +231,11 @@ ggplot(model_format, aes(x = year, y = population, fill = district_type, color =
     plot.title = element_text(hjust = 0.5)
   )
 ```
+The population trends from 1936 to 1942 reveal distinct shifts across the three districts in Shanghai: the Chinese-administered area, the French Concession, and the International Settlement. In the Chinese-administered area, the population remained stable until 1937, after which a decline began in 1940, continuing through 1942. The International Settlement experienced consistent population growth throughout the period, with the largest increases occurring after 1938. The French Concession maintained population stability until 1940, followed by a slight increase in 1941, which plateaued in 1942.
 
--   Model results are summarized in @tbl-modelresults in Appendix (@sec-model-details).
+## Model results 
+
+Model results are summarized in @tbl-modelresults in Appendix (@sec-model-details).
 
 ```{r}
 #| echo: false
@@ -243,7 +247,7 @@ ggplot(model_format, aes(x = year, y = population, fill = district_type, color =
 model_summary <- broom.mixed::tidy(did_model)
 ```
 
-#### District Impact on Population
+### District Impact on Population
 
 ```{r}
 #| echo: false
@@ -255,16 +259,17 @@ model_summary <- broom.mixed::tidy(did_model)
 
 # Filter for the specific coefficient you want (e.g., "cd_occupied")
 d_types <- model_summary |>
-  filter(term %in% c("(Intercept)", "district_is", "district_fc")) |>
+  filter(term %in% c("(Intercept)", "year", "district_is", "district_fc")) |>
   mutate(
     estimate = round(estimate, 2),
     std.error = round(std.error, 2))
 
 
-knitr::kable(d_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c"))
+knitr::kable(d_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c", "c"))
 ```
+Model estimates highlight the influence of district type on population. The baseline population, Chinese-administrated district population, is represented by the intercept, is estimated at 11,792,816.58, with a standard error of 18,954,543.85. This estimate is not a realistic estimate since the year variable is not included. This intercept is population at year = 0, which does not actually exist. Temporal impact on population is estimated using the *year* variable, observing a decline of 59,841.02 across all districts, with a standard error of 98,298.59. The International Settlement exhibits a population difference of -943,281.63 (standard error: 381,299.41) compared to the Chinese-administered area, while the French Concession shows a difference of -1,642,126.91 (standard error: 350,808.44).
 
-#### Historical Events
+### Historical Events
 
 ```{r}
 #| echo: false
@@ -283,9 +288,9 @@ event_types <- model_summary |>
 
 knitr::kable(event_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c"))
 ```
+The effects of three historical events on population are also quantified. The Japanese occupation of the Chinese-administered area in 1937 (cd_occupied) is associated with an increase of 89,350.01 (standard error: 350,665.57). France’s surrender in 1940 (french_surrender) results in a population decrease of 735,223.28 (standard error: 340,852.1). The Japanese occupation of the International Settlement in 1942 (is_occupied) corresponds to a population decrease of 88,982.32 (standard error: 361,506.9).
 
-#### Historic Events' Impact on Each District
-
+### Historic Events' Impact on Each District
 ```{r}
 #| echo: false
 #| eval: true
@@ -293,15 +298,15 @@ knitr::kable(event_types, col.names = c("Parameters", "Estimated Effect", "Stand
 #| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
 #| warning: false
 
-
 # Filter for the specific coefficient you want (e.g., "cd_occupied")
-impact_types <- model_summary[7:12, ] |>
+impact_types <- model_summary[8:12, ] |>
   mutate(estimate = round(estimate, 2),
     std.error = round(std.error, 2))
 
-print(impact_types)
 knitr::kable(impact_types, col.names = c("Parameters", "Estimated Effect", "Standard Error"), align = c("c", "c", "c", "c", "c", "c"))
 ```
+The interaction terms, which capture district-specific responses to historical events, provide additional insight. The Japanese occupation of the Chinese-administered area increases the population in the International Settlement by 89,430.69 (standard error: 414,726.8) and in the French Concession by 38,396.87 (standard error: 410,271.2). France’s surrender increases the population in the International Settlement by 470,617.65 (standard error: 352,215.9) and in the French Concession by 1,044,470.54 (standard error: 352,469.9). The Japanese occupation of the International Settlement itself is associated with an increase of 934,059.1 (standard error: 476,934.2) in the International Settlement’s population. Interaction terms differ from main effects by isolating the impact of historical events within each district type, providing a detailed analysis of population dynamics during this period.
+
 
 # Discussion
 
