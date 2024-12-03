@@ -30,7 +30,6 @@ The entire chat history is available in inputs/llms/usage.txt.
 1.  Datasheet
 2.  Upload Sketches
 3.  Introduction
-4.  Data Methodology
-5.  Model Justification
+4.  Cross-References
+5.  Add visualizations; check visualization captions
 6.  Discussion Refine
-7.  Appendix Model Testing
