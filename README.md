@@ -24,10 +24,3 @@ The repo is structured as:
 Aspects of the paper content and code were written with the help of the large language model, ChatGPT 4o.
 
 The entire chat history is available in inputs/llms/usage.txt.
-
-## Checklist
-
-3.  Introduction
-4.  Cross-References
-5.  Add visualizations; check visualization captions
-6.  Discussion Refine
